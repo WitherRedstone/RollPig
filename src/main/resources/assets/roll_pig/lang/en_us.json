@@ -1,0 +1,22 @@
+{
+  "roll_pig": "Pig of the Day",
+  "itemGroup.roll_pig_tab": "Pig of the Day",
+  "item.roll_pig.pigpen": "Pig Pen",
+  "gui.roll_pig.title": "Pig Pen",
+  "gui.roll_pig.total": "Total ×%s",
+  "gui.roll_pig.subtitle": "One pig a day, come and roll",
+  "gui.roll_pig.subtitle_used": "Rolled today, come back after dawn",
+  "gui.roll_pig.subtitle_result": "Today you rolled %s",
+  "gui.roll_pig.list": "Pigs",
+  "gui.roll_pig.detail": "Details",
+  "gui.roll_pig.count": "Rolled ×%s",
+  "gui.roll_pig.roll": "Roll today",
+  "gui.roll_pig.roll_used": "Used",
+  "gui.roll_pig.page": "Page %s / %s",
+  "gui.roll_pig.empty": "The pen is empty",
+  "message.roll_pig.no_chance": "You already rolled today. Come back after dawn.",
+  "message.roll_pig.no_pigs": "There is no pig to roll.",
+  "message.roll_pig.close_container": "Close the current screen first.",
+  "message.roll_pig.rolled": "You rolled %s",
+  "message.roll_pig.cancelled": "The roll was cancelled by another mod."
+}
