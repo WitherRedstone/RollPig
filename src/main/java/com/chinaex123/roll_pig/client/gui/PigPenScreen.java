@@ -1,7 +1,7 @@
 package com.chinaex123.roll_pig.client.gui;
 
 import com.chinaex123.roll_pig.client.RPClientTicker;
-import com.chinaex123.roll_pig.data.state.Pig;
+import com.chinaex123.roll_pig.util.Pig;
 import com.chinaex123.roll_pig.data.state.PigRegistry;
 import com.chinaex123.roll_pig.network.PigPenPayload;
 import com.chinaex123.roll_pig.network.RPNetwork;

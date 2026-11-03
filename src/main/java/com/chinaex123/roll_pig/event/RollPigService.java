@@ -1,14 +1,18 @@
-package com.chinaex123.roll_pig.event.logic;
+package com.chinaex123.roll_pig.event;
 
 import com.chinaex123.roll_pig.api.RollPigEvent;
 import com.chinaex123.roll_pig.api.RollResult;
-import com.chinaex123.roll_pig.data.state.Pig;
+import com.chinaex123.roll_pig.config.RPConfig;
+import com.chinaex123.roll_pig.util.Pig;
 import com.chinaex123.roll_pig.data.state.PigRegistry;
 import com.chinaex123.roll_pig.data.state.RollPigState;
 import com.chinaex123.roll_pig.init.RPAttachments;
 import com.chinaex123.roll_pig.network.PigPenPayload;
 import com.chinaex123.roll_pig.network.RPNetwork;
+import com.chinaex123.roll_pig.util.RPChatCard;
+import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.neoforge.common.NeoForge;
 
@@ -16,13 +20,15 @@ import java.util.List;
 
 public final class RollPigService {
 
-    private RollPigService() { }
-
     public static RollResult attempt(ServerPlayer player) {
+        return attempt(player, false);
+    }
+
+    public static RollResult attempt(ServerPlayer player, boolean force) {
         long cycle = RollPigState.cycleOf(player.level().getDayTime());
         RollPigState state = RPAttachments.get(player);
 
-        if (!state.canRoll(cycle)) {
+        if (!force && !state.canRoll(cycle)) {
             return RollResult.failure(RollResult.Reason.ALREADY_ROLLED);
         }
 
@@ -40,15 +46,33 @@ public final class RollPigService {
 
         // 每只猪概率相同，可以重复抽到
         Pig pig = pigs.get(player.getRandom().nextInt(pigs.size()));
-        RollPigState next = state.withRoll(pig.id(), cycle);
+        RollPigState next = force
+                ? state.withCount(pig.id(), state.countOf(pig.id()) + 1)
+                : state.withRoll(pig.id(), cycle);
         RPAttachments.set(player, next);
 
         NeoForge.EVENT_BUS.post(new RollPigEvent.Post(player, pig, next));
+        announce(player, pig, next);
         return RollResult.success(pig);
     }
 
+    private static void announce(ServerPlayer player, Pig pig, RollPigState state) {
+        if (!RPConfig.BROADCAST_ROLL.get()) {
+            return;
+        }
+        MinecraftServer server = player.getServer();
+        if (server == null) {
+            return;
+        }
+        RPChatQueue.broadcastLater(server, RPChatCard.build(player, pig, state), RPChatQueue.DELAY_TICKS);
+    }
+
     public static RollResult attemptAndNotify(ServerPlayer player, int mode) {
-        RollResult result = attempt(player);
+        return attemptAndNotify(player, mode, false);
+    }
+
+    public static RollResult attemptAndNotify(ServerPlayer player, int mode, boolean force) {
+        RollResult result = attempt(player, force);
         if (!result.success()) {
             player.displayClientMessage(result.message(), false);
             return result;
@@ -63,11 +87,15 @@ public final class RollPigService {
         return attemptAndNotify(player, mode).success();
     }
 
+    public static RollResult forceRoll(ServerPlayer player, int mode) {
+        return attemptAndNotify(player, mode, true);
+    }
+
     public static void handleRequest(ServerPlayer player) {
         if (player.containerMenu != player.inventoryMenu) {
             player.displayClientMessage(
                     Component.translatable("message.roll_pig.close_container")
-                            .withStyle(net.minecraft.ChatFormatting.RED), false);
+                            .withStyle(ChatFormatting.RED), false);
             return;
         }
         attemptAndNotify(player, PigPenPayload.MODE_UPDATE);

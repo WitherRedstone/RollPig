@@ -30,6 +30,12 @@ public final class RPClientPayloadHandler {
                     minecraft.setScreen(new PigPenScreen(payload));
                 }
             }
+            // 天亮刷新：只在界面开着时原地更新，没开就悄悄丢掉
+            case PigPenPayload.MODE_SYNC -> {
+                if (minecraft.screen instanceof PigPenScreen screen) {
+                    screen.refresh(payload);
+                }
+            }
             default -> {
             }
         }

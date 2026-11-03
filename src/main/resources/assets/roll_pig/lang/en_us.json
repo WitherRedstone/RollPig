@@ -18,5 +18,14 @@
   "message.roll_pig.no_pigs": "There is no pig to roll.",
   "message.roll_pig.close_container": "Close the current screen first.",
   "message.roll_pig.rolled": "You rolled %s",
-  "message.roll_pig.cancelled": "The roll was cancelled by another mod."
+  "message.roll_pig.cancelled": "The roll was cancelled by another mod.",
+  "message.roll_pig.new_day": "The sun is up - today's pig is ready to roll!",
+  "message.roll_pig.force.done": "Forced a roll for %s: %s",
+  "message.roll_pig.force.failed": "Force roll failed (no pigs loaded, or it was cancelled by another mod)",
+  "roll_pig.configuration.announce_new_day": "Announce new day",
+  "roll_pig.configuration.broadcast_roll": "Broadcast rolls",
+  "message.roll_pig.card.title": "[%s's Pig of the Day]",
+  "message.roll_pig.card.description": "Description: \"%s\"",
+  "message.roll_pig.card.collected": "Collected x%s",
+  "message.roll_pig.card.overview": "[Overview]"
 }

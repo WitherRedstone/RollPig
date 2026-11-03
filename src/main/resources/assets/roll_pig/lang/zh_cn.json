@@ -18,5 +18,14 @@
   "message.roll_pig.no_pigs": "猪圈里没有可以抽的猪猪",
   "message.roll_pig.close_container": "请先关闭当前界面",
   "message.roll_pig.rolled": "你抽到了 %s",
-  "message.roll_pig.cancelled": "这次抽奖被其他模组拦下了"
+  "message.roll_pig.cancelled": "这次抽奖被其他模组拦下了",
+  "message.roll_pig.new_day": "天亮了，今天的猪猪可以抽了",
+  "message.roll_pig.force.done": "已为 %s 强制抽取：%s",
+  "message.roll_pig.force.failed": "强制抽取失败（猪圈里没有猪猪，或被其他模组拦下了）",
+  "roll_pig.configuration.announce_new_day": "天亮提示",
+  "roll_pig.configuration.broadcast_roll": "抽到猪猪时广播",
+  "message.roll_pig.card.title": "【%s 的今日猪猪】",
+  "message.roll_pig.card.description": "描述：「%s」",
+  "message.roll_pig.card.collected": "已收集 ×%s",
+  "message.roll_pig.card.overview": "【概述】"
 }

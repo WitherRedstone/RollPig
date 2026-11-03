@@ -2,7 +2,7 @@ package com.chinaex123.roll_pig.network;
 
 import com.chinaex123.roll_pig.RollPig;
 import com.chinaex123.roll_pig.client.RPClientPayloadHandler;
-import com.chinaex123.roll_pig.event.logic.RollPigService;
+import com.chinaex123.roll_pig.event.RollPigService;
 import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -13,7 +13,8 @@ import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 @EventBusSubscriber(modid = RollPig.MODID)
 public final class RPNetwork {
 
-    private RPNetwork() { }
+    private RPNetwork() {
+    }
 
     @SubscribeEvent
     public static void register(RegisterPayloadHandlersEvent event) {

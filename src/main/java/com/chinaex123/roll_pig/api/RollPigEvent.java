@@ -1,6 +1,6 @@
 package com.chinaex123.roll_pig.api;
 
-import com.chinaex123.roll_pig.data.state.Pig;
+import com.chinaex123.roll_pig.util.Pig;
 import com.chinaex123.roll_pig.data.state.RollPigState;
 import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.bus.api.Event;

@@ -10,7 +10,6 @@ import net.neoforged.neoforge.registries.NeoForgeRegistries;
 import java.util.function.Supplier;
 
 public final class RPAttachments {
-
     public static final DeferredRegister<AttachmentType<?>> ATTACHMENT_TYPES = DeferredRegister.create(NeoForgeRegistries.Keys.ATTACHMENT_TYPES, RollPig.MODID);
 
     public static final Supplier<AttachmentType<RollPigState>> ROLL_STATE =
@@ -18,8 +17,6 @@ public final class RPAttachments {
                     .serialize(RollPigState.CODEC)
                     .copyOnDeath()
                     .build());
-
-    private RPAttachments() { }
 
     public static RollPigState get(Player player) {
         return player.getData(ROLL_STATE.get());

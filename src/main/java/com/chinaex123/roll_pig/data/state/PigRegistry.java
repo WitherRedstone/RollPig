@@ -1,6 +1,7 @@
 package com.chinaex123.roll_pig.data.state;
 
 import com.chinaex123.roll_pig.RollPig;
+import com.chinaex123.roll_pig.util.Pig;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;

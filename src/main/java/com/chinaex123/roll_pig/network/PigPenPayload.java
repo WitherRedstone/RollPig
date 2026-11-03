@@ -18,6 +18,8 @@ public record PigPenPayload(int mode, boolean canRoll, String highlight, Map<Str
     public static final int MODE_RESULT = 1;
     /** 在界面里点按钮抽取：就地刷新已打开的界面。 */
     public static final int MODE_UPDATE = 2;
+    /** 天亮刷新：界面开着就原地更新，没开就丢掉。 */
+    public static final int MODE_SYNC = 3;
 
     public static final CustomPacketPayload.Type<PigPenPayload> TYPE =
             new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(RollPig.MODID, "pig_pen"));
