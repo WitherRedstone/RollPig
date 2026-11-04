@@ -7,6 +7,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import net.minecraft.resources.ResourceLocation;
+import net.neoforged.fml.loading.FMLPaths;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -23,6 +24,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -34,6 +36,7 @@ public final class PigRegistry {
 
     public static final String DATA_DIR = "data/roll_pig/pigsty";
     public static final String IMAGE_DIR = "assets/roll_pig/textures/pigsty/image";
+    public static final String CUSTOM_PATH = "roll_pig";
 
     private static volatile List<Pig> cache;
 
@@ -61,56 +64,115 @@ public final class PigRegistry {
     }
 
     public static ResourceLocation imageLocation(String pigId) {
-        String safe = pigId.toLowerCase(Locale.ROOT).replaceAll("[^a-z0-9/._-]", "_");
-        return ResourceLocation.fromNamespaceAndPath(RollPig.MODID, "pigsty/image/" + safe);
+        return ResourceLocation.fromNamespaceAndPath(RollPig.MODID, "pigsty/image/" + sanitize(pigId));
     }
 
     public static InputStream openImage(String pigId) {
-        return PigRegistry.class.getResourceAsStream("/" + IMAGE_DIR + "/" + pigId + ".png");
+        InputStream builtin = PigRegistry.class.getResourceAsStream("/" + IMAGE_DIR + "/" + pigId + ".png");
+        if (builtin != null) {
+            return builtin;
+        }
+        Path custom = customImageDir().resolve(sanitize(pigId) + ".png");
+        try {
+            return Files.isRegularFile(custom) ? Files.newInputStream(custom) : null;
+        } catch (IOException exception) {
+            RollPig.LOGGER.warn("无法读取自定义猪猪图片: {}", custom, exception);
+            return null;
+        }
+    }
+
+    private static String sanitize(String pigId) {
+        return pigId.toLowerCase(Locale.ROOT).replaceAll("[^a-z0-9/._-]", "_");
+    }
+
+    public static Path customDataDir() {
+        return FMLPaths.CONFIGDIR.get().resolve(CUSTOM_PATH).resolve("pigsty");
+    }
+
+    public static Path customImageDir() {
+        return FMLPaths.CONFIGDIR.get().resolve(CUSTOM_PATH).resolve("image");
     }
 
     private static List<Pig> load() {
+        Map<String, Pig> pigs = new LinkedHashMap<>();
         List<String> files = listJsonFiles();
         Collections.sort(files);
-        List<Pig> pigs = new ArrayList<>();
         for (String file : files) {
-            String fallbackId = file.substring(0, file.length() - ".json".length());
             try (InputStream stream = PigRegistry.class.getResourceAsStream("/" + DATA_DIR + "/" + file)) {
                 if (stream == null) {
                     continue;
                 }
-                JsonElement root = JsonParser.parseString(readString(stream));
-                JsonArray entries;
-                if (root.isJsonArray()) {
-                    entries = root.getAsJsonArray();
-                } else if (root.isJsonObject()) {
-                    entries = new JsonArray();
-                    entries.add(root);
-                } else {
-                    RollPig.LOGGER.warn("猪猪资料格式无法识别: {}", file);
-                    continue;
-                }
-                for (JsonElement element : entries) {
-                    if (!element.isJsonObject()) {
-                        continue;
-                    }
-                    JsonObject object = element.getAsJsonObject();
-                    String id = optString(object, "id", fallbackId);
-                    String name = optString(object, "name", id);
-                    String description = optString(object, "description", "");
-                    String analysis = optString(object, "analysis", "");
-                    pigs.add(new Pig(id, name, description, analysis));
+                for (Pig pig : readPigs(file, stream)) {
+                    pigs.put(pig.id(), pig);
                 }
             } catch (Exception exception) {
                 RollPig.LOGGER.error("读取猪猪资料失败: {}", file, exception);
             }
         }
+
+        int custom = 0;
+        for (Path path : listCustomJsonFiles()) {
+            try (InputStream stream = Files.newInputStream(path)) {
+                for (Pig pig : readPigs(path.getFileName().toString(), stream)) {
+                    if (pigs.put(pig.id(), pig) == null) {
+                        custom++;
+                    }
+                }
+            } catch (Exception exception) {
+                RollPig.LOGGER.error("读取自定义猪猪资料失败: {}", path, exception);
+            }
+        }
+
         if (pigs.isEmpty()) {
             RollPig.LOGGER.warn("没有在 {} 里找到任何猪猪", DATA_DIR);
         } else {
-            RollPig.LOGGER.info("猪圈里共 {} 只猪猪", pigs.size());
+            RollPig.LOGGER.info("猪圈里共 {} 只猪猪（其中自定义 {} 只）", pigs.size(), custom);
         }
-        return List.copyOf(pigs);
+        return List.copyOf(pigs.values());
+    }
+
+    private static List<Path> listCustomJsonFiles() {
+        Path dir = customDataDir();
+        if (!Files.isDirectory(dir)) {
+            return List.of();
+        }
+        try (Stream<Path> stream = Files.list(dir)) {
+            return stream.filter(Files::isRegularFile)
+                    .filter(path -> path.getFileName().toString().endsWith(".json"))
+                    .sorted()
+                    .toList();
+        } catch (IOException exception) {
+            RollPig.LOGGER.warn("无法列出自定义猪猪目录: {}", dir, exception);
+            return List.of();
+        }
+    }
+
+    private static List<Pig> readPigs(String file, InputStream stream) throws IOException {
+        List<Pig> result = new ArrayList<>();
+        String fallbackId = file.endsWith(".json") ? file.substring(0, file.length() - ".json".length()) : file;
+        JsonElement root = JsonParser.parseString(readString(stream));
+        JsonArray entries;
+        if (root.isJsonArray()) {
+            entries = root.getAsJsonArray();
+        } else if (root.isJsonObject()) {
+            entries = new JsonArray();
+            entries.add(root);
+        } else {
+            RollPig.LOGGER.warn("猪猪资料格式无法识别: {}", file);
+            return result;
+        }
+        for (JsonElement element : entries) {
+            if (!element.isJsonObject()) {
+                continue;
+            }
+            JsonObject object = element.getAsJsonObject();
+            String id = optString(object, "id", fallbackId);
+            String name = optString(object, "name", id);
+            String description = optString(object, "description", "");
+            String analysis = optString(object, "analysis", "");
+            result.add(new Pig(id, name, description, analysis));
+        }
+        return result;
     }
 
     private static List<String> listJsonFiles() {
@@ -229,6 +291,6 @@ public final class PigRegistry {
         while ((read = stream.read(buffer)) != -1) {
             out.write(buffer, 0, read);
         }
-        return out.toString(StandardCharsets.UTF_8);
+        return out.toString(StandardCharsets.UTF_8).replace("\uFEFF", "");
     }
 }
