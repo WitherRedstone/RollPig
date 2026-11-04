@@ -82,6 +82,40 @@ public final class RollPigApi {
         RPAttachments.set(player, RPAttachments.get(player).withRolledToday(false));
     }
 
+    public static int unlockAll(Player player) {
+        List<Pig> pigs = PigRegistry.all();
+        RollPigState before = RPAttachments.get(player);
+        RollPigState after = before.withUnlocked(pigs.stream().map(Pig::id).toList());
+        RPAttachments.set(player, after);
+        if (player instanceof ServerPlayer serverPlayer) {
+            sync(serverPlayer);
+        }
+        int unlocked = 0;
+        for (Pig pig : pigs) {
+            if (before.countOf(pig.id()) <= 0 && after.countOf(pig.id()) > 0) {
+                unlocked++;
+            }
+        }
+        return unlocked;
+    }
+
+    public static int collected(Player player) {
+        RollPigState state = RPAttachments.get(player);
+        int found = 0;
+        for (Pig pig : PigRegistry.all()) {
+            if (state.countOf(pig.id()) > 0) {
+                found++;
+            }
+        }
+        return found;
+    }
+
+    public static void sync(ServerPlayer player) {
+        RollPigState state = RPAttachments.get(player);
+        RPNetwork.sendTo(player, new PigPenPayload(PigPenPayload.MODE_SYNC,
+                state.canRoll(currentCycle(player.level())), "", state.counts()));
+    }
+
     public static void setCount(Player player, String pigId, int count) {
         RPAttachments.set(player, RPAttachments.get(player).withCount(pigId, count));
     }

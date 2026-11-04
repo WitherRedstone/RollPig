@@ -1,7 +1,9 @@
 package com.chinaex123.roll_pig.command;
 
 import com.chinaex123.roll_pig.RollPig;
+import com.chinaex123.roll_pig.api.RollPigApi;
 import com.chinaex123.roll_pig.api.RollResult;
+import com.chinaex123.roll_pig.data.state.PigRegistry;
 import com.chinaex123.roll_pig.event.RPChatQueue;
 import com.chinaex123.roll_pig.event.RollPigService;
 import com.chinaex123.roll_pig.network.PigPenPayload;
@@ -24,8 +26,8 @@ import java.util.List;
 public final class RPCommands {
 
     private static final String[] NAMES = {"rollpig", "今日猪猪"};
-
     private static final int FORCE_PERMISSION = 2;
+    private static final int UNLOCK_PERMISSION = 2;
 
     private RPCommands() { }
 
@@ -43,6 +45,15 @@ public final class RPCommands {
                             // /rollpig force <targets> —— 给别人来一次
                             .then(Commands.argument("targets", EntityArgument.players())
                                     .executes(context -> forceRoll(context,
+                                            EntityArgument.getPlayers(context, "targets")))))
+                    .then(Commands.literal("unlock")
+                            .requires(source -> source.hasPermission(UNLOCK_PERMISSION))
+                            // /rollpig unlock —— 解锁自己的全部猪猪
+                            .executes(context -> unlock(context,
+                                    List.of(context.getSource().getPlayerOrException())))
+                            // /rollpig unlock <targets> —— 解锁别人的全部猪猪
+                            .then(Commands.argument("targets", EntityArgument.players())
+                                    .executes(context -> unlock(context,
                                             EntityArgument.getPlayers(context, "targets"))))));
         }
     }
@@ -79,5 +90,30 @@ public final class RPCommands {
                     .withStyle(ChatFormatting.RED));
         }
         return success;
+    }
+
+    private static int unlock(CommandContext<CommandSourceStack> context, Collection<ServerPlayer> targets) {
+        int total = PigRegistry.all().size();
+        int handled = 0;
+        for (ServerPlayer target : targets) {
+            int unlocked = RollPigApi.unlockAll(target);
+            handled++;
+            Component feedback = Component.translatable("message.roll_pig.unlock.done",
+                    target.getDisplayName(),
+                    Component.literal(Integer.toString(unlocked)),
+                    Component.literal(Integer.toString(RollPigApi.collected(target))),
+                    Component.literal(Integer.toString(total))).withStyle(ChatFormatting.GRAY);
+            // 自己执行就自己看；给别人解锁时两边都收到一条
+            ServerPlayer sender = context.getSource().getEntity() instanceof ServerPlayer player ? player : null;
+            if (sender == null) {
+                context.getSource().sendSuccess(() -> feedback, false);
+            } else {
+                sender.displayClientMessage(feedback, false);
+            }
+            if (target != sender) {
+                target.displayClientMessage(feedback, false);
+            }
+        }
+        return handled;
     }
 }

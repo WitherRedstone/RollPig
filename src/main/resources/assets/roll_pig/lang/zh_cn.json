@@ -24,6 +24,7 @@
   "message.roll_pig.new_day": "天亮了，今天的猪猪可以抽了",
   "message.roll_pig.force.done": "已为 %s 强制抽取：%s",
   "message.roll_pig.force.failed": "强制抽取失败（猪圈里没有猪猪，或被其他模组拦下了）",
+  "message.roll_pig.unlock.done": "已解锁 %s 的猪圈：新增 %s 只，现在共 %s / %s 只",
   "message.roll_pig.sticker.unknown": "这只猪猪不在猪圈里",
 
   "message.roll_pig.card.title": "【%s 的今日猪猪】",

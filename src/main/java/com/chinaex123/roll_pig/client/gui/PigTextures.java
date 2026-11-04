@@ -40,6 +40,8 @@ public final class PigTextures {
     private static Sprite load(String pigId) {
         try (InputStream stream = PigRegistry.openImage(pigId)) {
             if (stream == null) {
+                RollPig.LOGGER.warn("找不到猪猪图片 {}：如果这是自定义猪，图片应该放在 {}",
+                        pigId, PigRegistry.customImageFile(pigId).toAbsolutePath());
                 return null;
             }
             NativeImage image = NativeImage.read(stream);
@@ -51,15 +53,23 @@ public final class PigTextures {
             Minecraft.getInstance().getTextureManager().register(location, texture);
             return new Sprite(location, width, height);
         } catch (Exception exception) {
-            RollPig.LOGGER.warn("无法加载猪猪图片: {}", pigId, exception);
+            RollPig.LOGGER.warn("无法加载猪猪图片 {}：只支持真正的 PNG 文件，改扩展名不管用（自定义图应放在 {}）",
+                    pigId, PigRegistry.customImageFile(pigId).toAbsolutePath(), exception);
             return null;
         }
     }
 
     public record Sprite(ResourceLocation texture, int width, int height) {
 
+        /** 按原图比例缩放到 size×size 的方框里居中画，非正方形图片不会被拉扁。 */
         public void draw(GuiGraphics guiGraphics, int x, int y, int size) {
-            guiGraphics.blit(this.texture, x, y, size, size, 0.0F, 0.0F, this.width, this.height, this.width, this.height);
+            float scale = Math.min((float) size / this.width, (float) size / this.height);
+            int drawWidth = Math.max(1, Math.round(this.width * scale));
+            int drawHeight = Math.max(1, Math.round(this.height * scale));
+            int offsetX = x + (size - drawWidth) / 2;
+            int offsetY = y + (size - drawHeight) / 2;
+            guiGraphics.blit(this.texture, offsetX, offsetY, drawWidth, drawHeight,
+                    0.0F, 0.0F, this.width, this.height, this.width, this.height);
         }
 
         public void close() {

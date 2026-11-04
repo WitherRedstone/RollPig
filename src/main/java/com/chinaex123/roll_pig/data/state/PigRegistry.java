@@ -38,6 +38,24 @@ public final class PigRegistry {
     public static final String IMAGE_DIR = "assets/roll_pig/textures/pigsty/image";
     public static final String CUSTOM_PATH = "roll_pig";
 
+    private static final String GUIDE = """
+            Roll Pig —— 自定义猪猪目录
+            ==========================
+
+            pigsty/   一只猪一个 .json，字段：id / name / description / analysis
+            image/    图片，文件名必须和 json 里的 id 一致；必须是真正的 PNG
+
+            例：
+              pigsty/my-pig.json
+              image/my-pig.png
+
+            改完要重启游戏（单人）或重启服务器（联机）。
+            客户端还需要同样的 pigsty/*.json 和 image/*.png 才能看到图和文案。
+
+            详细步骤见模组 README 的「自定义猪猪」章节。
+            这个说明文件是自动生成的，删掉下次启动还会再写一份。
+            """;
+
     private static volatile List<Pig> cache;
 
     private PigRegistry() {
@@ -72,7 +90,7 @@ public final class PigRegistry {
         if (builtin != null) {
             return builtin;
         }
-        Path custom = customImageDir().resolve(sanitize(pigId) + ".png");
+        Path custom = customImageFile(pigId);
         try {
             return Files.isRegularFile(custom) ? Files.newInputStream(custom) : null;
         } catch (IOException exception) {
@@ -81,19 +99,55 @@ public final class PigRegistry {
         }
     }
 
+    /** 自定义猪猪图片应该放在哪里（报错时用来告诉玩家去哪个路径找）。 */
+    public static Path customImageFile(String pigId) {
+        return customImageDir().resolve(sanitize(pigId) + ".png");
+    }
+
     private static String sanitize(String pigId) {
         return pigId.toLowerCase(Locale.ROOT).replaceAll("[^a-z0-9/._-]", "_");
     }
 
+    public static Path customRoot() {
+        return FMLPaths.CONFIGDIR.get().resolve(CUSTOM_PATH);
+    }
+
     public static Path customDataDir() {
-        return FMLPaths.CONFIGDIR.get().resolve(CUSTOM_PATH).resolve("pigsty");
+        return customRoot().resolve("pigsty");
     }
 
     public static Path customImageDir() {
-        return FMLPaths.CONFIGDIR.get().resolve(CUSTOM_PATH).resolve("image");
+        return customRoot().resolve("image");
+    }
+
+    /**
+     * 启动时把 config/roll_pig/pigsty 与 config/roll_pig/image 建好，
+     * 顺便放一份说明文件，省得玩家自己去猜目录结构。
+     */
+    public static void ensureCustomDirs() {
+        Path root = customRoot();
+        try {
+            boolean created = false;
+            for (Path dir : List.of(customDataDir(), customImageDir())) {
+                if (!Files.isDirectory(dir)) {
+                    Files.createDirectories(dir);
+                    created = true;
+                }
+            }
+            Path guide = root.resolve("README.txt");
+            if (!Files.isRegularFile(guide)) {
+                Files.writeString(guide, GUIDE, StandardCharsets.UTF_8);
+            }
+            if (created) {
+                RollPig.LOGGER.info("已创建自定义猪猪目录: {}（文案放 pigsty，图片放 image）", root);
+            }
+        } catch (IOException exception) {
+            RollPig.LOGGER.warn("无法创建自定义猪猪目录: {}", root, exception);
+        }
     }
 
     private static List<Pig> load() {
+        ensureCustomDirs();
         Map<String, Pig> pigs = new LinkedHashMap<>();
         List<String> files = listJsonFiles();
         Collections.sort(files);

@@ -24,6 +24,7 @@
   "message.roll_pig.new_day": "The sun is up - today's pig is ready to roll!",
   "message.roll_pig.force.done": "Forced a roll for %s: %s",
   "message.roll_pig.force.failed": "Force roll failed (no pigs loaded, or it was cancelled by another mod)",
+  "message.roll_pig.unlock.done": "Unlocked %s's pig pen: %s new, now %s / %s",
   "message.roll_pig.sticker.unknown": "That pig is not in the pen",
 
   "message.roll_pig.card.title": "[%s's Pig of the Day]",

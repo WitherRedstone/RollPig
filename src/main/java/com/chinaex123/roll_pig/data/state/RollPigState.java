@@ -3,6 +3,7 @@ package com.chinaex123.roll_pig.data.state;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -60,6 +61,14 @@ public record RollPigState(Map<String, Integer> counts, long lastCycle, boolean 
 
     public RollPigState withCounts(Map<String, Integer> newCounts) {
         return new RollPigState(Map.copyOf(newCounts), lastCycle, rolledToday);
+    }
+
+    public RollPigState withUnlocked(Collection<String> pigIds) {
+        Map<String, Integer> next = new HashMap<>(counts);
+        for (String pigId : pigIds) {
+            next.merge(pigId, 1, Math::max);
+        }
+        return new RollPigState(Map.copyOf(next), lastCycle, rolledToday);
     }
 
     public RollPigState withRolledToday(boolean rolled) {
