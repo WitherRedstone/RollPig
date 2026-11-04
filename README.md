@@ -1,194 +1,196 @@
-# Roll Pig · 今日猪猪
+**English** | [简体中文](README_ZH.md)
 
-## 介绍
+# Roll Pig · Today's Pig
 
-每天抽一只猪，收进猪圈，还能当聊天贴纸发出去。
+## Introduction
 
----
-
-## 玩法
-
-### 抽猪
-
-每天每名玩家可以抽 **一次** 猪猪，游戏内天亮（`dayTime % 24000 == 0`）后自动刷新机会，**次数不叠加**——今天没抽，攒不到明天。
-
-- 全库每只猪 **等概率**，**可重复抽到**，重复抽到的会累加收集次数（`已收集 ×N`）。
-- 抽中时会播放**不死图腾**动画，动画结束后才弹出聊天卡片。
-- 收集记录按玩家存档（`neoforge:attachments` 里的 `roll_pig:roll_state`），死亡不掉落，换存档互不影响。
-
-抽取入口有三个：
-
-- **右键「猪圈」物品** —— 打开完整 GUI，可以翻页浏览全部猪猪和收集情况
-- **`/rollpig` 或 `/今日猪猪`** —— 直接抽一次，播放图腾动画 + 结果页
-- **`/rollpig force [目标]`** —— OP 用，强制抽一次，**不消耗**当天次数
-
-### 聊天贴纸
-
-打开聊天输入框，右下角有个小猪圈图标，点开是已收集猪猪的选图面板。点一只猪会在输入框插入 `[猪猪名]`，发送后聊天栏里会自动渲染成那只猪的小头像。
-
-> 只有**已收集**的猪猪才能作为贴纸发出。
+Roll one pig every day, keep it in your pigpen, and send it as a chat sticker.
 
 ---
 
-## 指令
+## Gameplay
 
-- **`/rollpig`**、**`/今日猪猪`** —— 所有人可用，抽一次今日猪猪
-- **`/rollpig force`** —— 需要 OP，给自己强制抽一次，不消耗次数
-- **`/rollpig force <目标>`** —— 需要 OP，给指定玩家强制抽一次
-- **`/rollpig unlock`** —— 需要 OP，解锁猪圈里全部猪猪
-- **`/rollpig unlock <目标>`** —— 需要 OP，解锁指定玩家的全部猪猪
+### Rolling
 
-`unlock` 只补不删：没抽到的猪补成 1 次，已经抽到更多次的保持原值，所以「总次数」会变成「原本的次数 + 新解锁的只数」。解锁后会立刻把新的收集情况同步给客户端，聊天贴纸面板马上就能用；猪圈界面开着的话也会原地刷新。
+Each player can roll **once** per day. The chance refreshes at dawn (`dayTime % 24000 == 0`), and **chances do not stack** — skipping today does not give you two tomorrow.
+
+- Every pig in the pool has **the same probability**, and **duplicates are allowed** — rolling the same pig again increases its collected count (`Collected ×N`).
+- A **Totem of Undying** animation plays when you roll; the chat card only appears after the animation finishes.
+- Progress is stored per player in the save (`roll_pig:roll_state` inside `neoforge:attachments`), is kept on death, and is independent per world.
+
+There are three ways to roll:
+
+- **Right-click the "Pigpen" item** — opens the full GUI, where you can page through every pig and your progress
+- **`/rollpig` or `/今日猪猪`** — rolls immediately, plays the totem animation and shows the result screen
+- **`/rollpig force [target]`** — for OPs: forces a roll **without** consuming today's chance
+
+### Chat stickers
+
+Open the chat input box: there is a small pigpen icon in the bottom-right corner. Click it to open a picker of the pigs you have collected. Clicking a pig inserts `[pig name]` into the input box; once sent, the chat renders it as that pig's little portrait.
+
+> Only **collected** pigs can be sent as stickers.
 
 ---
 
-## 自定义猪猪
+## Commands
 
-往游戏目录里放文件就行。
-真正需要你操心的只有三样东西：
+- **`/rollpig`**, **`/今日猪猪`** — available to everyone, rolls today's pig
+- **`/rollpig force`** — requires OP, forces a roll for yourself without consuming a chance
+- **`/rollpig force <targets>`** — requires OP, forces a roll for the given players
+- **`/rollpig unlock`** — requires OP, unlocks every pig in the pigpen
+- **`/rollpig unlock <targets>`** — requires OP, unlocks every pig for the given players
 
-- `config/roll_pig/pigsty/<id>.json` —— 这只猪的文案
-- `config/roll_pig/image/<id>.png` —— 这只猪的图
-- （可选）一个资源包 + `config/roll_pig/pig_glyphs.json` —— 只影响**聊天卡片左上角那个 36 像素的小头像**
+`unlock` only adds, never removes: pigs you never rolled are bumped to 1, pigs you already rolled keep their higher count — so your "total count" becomes "previous count + number of newly unlocked pigs". After unlocking, the new progress is synced to clients immediately, so the sticker picker works right away; if the pigpen GUI is open, it refreshes in place.
 
-**先把「三处图」分清楚**，大部分人卡在这一步：
+---
 
-- **猪圈 GUI 里的大图和列表小头像** —— 直接读 `config/roll_pig/image/<id>.png`，所以**客户端**必须放这张图。
-- **聊天栏里的贴纸**（发 `[猪猪名]` 变成小图） —— 也是直接读那张原图，按 12 像素画出来，同样要**客户端**有图。
-- **聊天卡片左上角的 36px 头像**（`【xxx 的今日猪猪】` 那张卡） —— 这个**不是图片，是字体里的一个字符**，来自图集 `pig_icons.png`。想让它显示新猪，必须用资源包换图集 + 用对照表告诉模组「哪个 id 对应哪一格」。
+## Custom pigs
 
-结论：
+Just drop files into the game directory.
+There are only three things you actually need to care about:
 
-- 只想让猪能抽、能看、能当贴纸 → 做完第 1 节就结束了。
-- 还想让聊天卡片左上角也是这只新猪 → 再看第 5、6 节（或者第 7 节手画）。
+- `config/roll_pig/pigsty/<id>.json` — this pig's text
+- `config/roll_pig/image/<id>.png` — this pig's picture
+- (optional) a resource pack + `config/roll_pig/pig_glyphs.json` — only affects **the 36-pixel portrait in the top-left of the chat card**
 
-### 1. 加一只自己的猪
+**First, tell the "three images" apart** — this is where most people get stuck:
 
-**第 1 步：建目录。** **不用自己建**——第一次启动游戏（或服务器）时，模组会自动在 `config/roll_pig/` 下建好 `pigsty/` 和 `image/`，还会放一份 `README.txt` 说明这两个目录是干什么的。你只要往里丢文件：
+- **The big portrait and the list thumbnails in the pigpen GUI** — read straight from `config/roll_pig/image/<id>.png`, so the **client** must have that file.
+- **Chat stickers** (sending `[pig name]` turns into a small picture) — also read from that same original file, drawn at 12 pixels, so the **client** needs the file too.
+- **The 36px portrait in the top-left of the chat card** (the `【xxx's Today's Pig】` card) — this is **not a picture but a character in a font**, taken from the atlas `pig_icons.png`. To show a new pig there you must replace the atlas with a resource pack **and** tell the mod "which id maps to which cell" via the lookup table.
+
+In short:
+
+- If you only want the pig to be rollable, viewable and usable as a sticker → section 1 is all you need.
+- If you also want the new pig on the chat card → continue with sections 5 and 6 (or draw it by hand, section 7).
+
+### 1. Add a pig of your own
+
+**Step 1: create the directories.** **You don't have to** — on the first launch of the game (or server) the mod creates `pigsty/` and `image/` under `config/roll_pig/` automatically, plus a `README.txt` explaining what the two folders are for. You just drop files in:
 
 ```
 config/roll_pig/
-├─ README.txt              ← 自动生成，删掉下次启动还会再写一份
-├─ pigsty/                 ← 一只猪一个 .json
+├─ README.txt              ← generated automatically; deleted? it comes back next launch
+├─ pigsty/                 ← one .json per pig
 │   └─ my-pig.json
-└─ image/                  ← 图片，文件名 = id
+└─ image/                  ← pictures, file name = id
     └─ my-pig.png
 ```
 
-注意是**两个平级目录**：文案进 `pigsty/`，图片进 `image/`。图片不要塞进 `pigsty/`。
+Note that these are **two sibling directories**: text goes into `pigsty/`, pictures go into `image/`. Do not put pictures inside `pigsty/`.
 
-**第 2 步：写文案。** 新建 `config/roll_pig/pigsty/my-pig.json`，用 **UTF-8** 保存：
+**Step 2: write the text.** Create `config/roll_pig/pigsty/my-pig.json` and save it as **UTF-8**:
 
 ```json
 {
   "id": "my-pig",
-  "name": "我的猪猪",
-  "description": "它的小简介",
-  "analysis": "关于这只猪的长篇概述。可以写很长，GUI 里会自动折行，装不下的部分可以用滚轮往下翻。"
+  "name": "My Pig",
+  "description": "A short one-liner",
+  "analysis": "A long description of this pig. It can be very long: the GUI wraps it automatically, and anything that does not fit can be scrolled with the mouse wheel."
 }
 ```
 
-**第 3 步：放图。** 图片放到 `config/roll_pig/image/my-pig.png`，文件名必须和 `id` 完全一致。必须是**真正的 PNG** 文件（判断方法见第 3 节），建议 240×240 或更大、正方形、带透明背景。
+**Step 3: add the picture.** Put it at `config/roll_pig/image/my-pig.png`; the file name must match the `id` exactly. It must be a **real PNG** file (see section 3 for how to tell), 240×240 or larger is recommended, square, with a transparent background.
 
-**第 4 步：重启。** 猪猪资料只在启动时读一次，图片也是进世界时加载，所以改完要重启客户端 / 服务器（单人游戏退出到标题再进也行）。
+**Step 4: restart.** Pig data is read once at startup and pictures are loaded when you enter a world, so restart the client / server after changing anything (in single player, quitting to the title and re-entering also works).
 
-**第 5 步：看日志。** 启动时控制台会打印：
+**Step 5: check the log.** At startup the console prints:
 
 ```
 [co.ch.ro.RollPig/]: 猪圈里共 166 只猪猪（其中自定义 1 只）
 ```
 
-看到「其中自定义 1 只」就说明读到了。如果只显示 165 只、且没有后面的括号，说明 json 没被找到——回去检查路径、扩展名（是不是 `my-pig.json.txt`）、编码。
+If you see "其中自定义 1 只" (of which 1 custom), it was loaded. If it only says 165 pigs with no parentheses, the json was not found — double-check the path, the extension (is it `my-pig.json.txt`?) and the encoding.
 
-**第 6 步：进游戏确认三件事。**
+**Step 6: confirm three things in game.**
 
-- 右键「猪圈」物品，翻到最后一页，列表里应该出现「我的猪猪」，点开详情有图、有描述、有概述。
-- `/rollpig force`（OP）或直接等抽到它，确认播放图腾动画、弹出聊天卡片。
-- 抽到之后打开聊天输入框，点右下角的小猪图标，面板里应该能点到它，发送后在聊天栏显示成小图。
+- Right-click the "Pigpen" item, page to the last page: "My Pig" should be in the list, and its detail should have a picture, a description and an analysis.
+- `/rollpig force` (OP) or simply roll until you get it: confirm the totem animation plays and the chat card appears.
+- After collecting it, open the chat input and click the small pig icon in the bottom-right: the pig should be clickable in the panel, and sending it should render as a small picture in chat.
 
-三件事都正常，这只猪就彻底接进来了。
+When all three work, the pig is fully hooked up.
 
-### 2. 字段说明
+### 2. Field reference
 
-- **`id`** —— 唯一标识，同时是**图片文件名**。不填时用 json 的文件名。
-- **`name`** —— 显示名。列表、详情标题、指令结果、聊天卡片都用它。必填。
-- **`description`** —— 短描述。详情页名字下面那行，也是聊天卡片里的「描述：「…」」。
-- **`analysis`** —— 长概述。详情页下方可滚动区域，也是聊天卡片【概述】的正文。
+- **`id`** — unique identifier, and also the **picture file name**. If omitted, the json file name is used.
+- **`name`** — display name. Used in the list, the detail title, command output and the chat card. Required.
+- **`description`** — short description. The line under the name on the detail page, and the "Description: 「…」" in the chat card.
+- **`analysis`** — long description. The scrollable area at the bottom of the detail page, and the body of 【Overview】 in the chat card.
 
-格式上的两条规则：
+Two formatting rules:
 
-- 一个文件可以只写**一个对象**，也可以写**对象数组**，一次定义好几只猪。
-- 文件用 UTF-8 保存。带 BOM 也能读（模组会清掉），但建议无 BOM。
+- A file may contain **a single object** or **an array of objects**, defining several pigs at once.
+- Save files as UTF-8. A BOM is tolerated (the mod strips it), but no BOM is recommended.
 
-**`id` 一定要用小写英文、数字、连字符 `-` 和下划线 `_`。** 原因：模组会先把 id 转小写、再把「不是 `a-z`、`0-9`、`-`、`_`、`.`、`/` 的字符」统统换成 `_`，然后用这个结果去找图片。也就是说 `id` 写 `我的猪` 会变成 `__`，图片就得叫 `__.png`——能跑但对不上账，所以别用中文 id（中文写进 `name` 里就行）。
+**`id` must use lowercase ASCII letters, digits, `-` and `_`.** Why: the mod lowercases the id, replaces every character that is not `a-z`, `0-9`, `-`, `_`, `.` or `/` with `_`, and then looks for the picture using the result. So an `id` of `我的猪` becomes `__`, and the picture would have to be named `__.png` — it works, but the bookkeeping is a mess, so avoid non-ASCII ids (put Chinese in `name` instead).
 
-### 3. 图片要求
+### 3. Picture requirements
 
-- **必须是真正的 PNG**。这是最常见的坑：浏览器「另存为」经常给你 webp / gif / avif，只改扩展名为 `.png` 是没用的，游戏只认 PNG 字节流。
-  - 判断方法一：用系统「画图」打开，如果打得开说明格式常见，但更稳妥的是**另存为 PNG** 再放进去。
-  - 判断方法二：看文件头。PNG 的前 8 个字节是 `89 50 4E 47 0D 0A 1A 0A`；如果是 `47 49 46 38`（`GIF8`）或 `52 49 46 46`（`RIFF`，webp）就不是 PNG。
-  - 判断方法三：直接看日志。加载失败时模组会打印 `无法加载猪猪图片 xxx：只支持真正的 PNG 文件`，并带上它正在找的完整路径。
-- 尺寸不限，会**按比例**缩放到方框里居中显示，不会被拉扁。建议 **240×240 或 512×512 的正方形**；特别宽或特别高的图在 48×48 的框里会显得小。
-- **建议带透明背景**（RGBA）。不透明的白底图在深色 GUI 里会看到一个白方块。
-- 一张图只对应一个 id，文件名必须和 id 一致：`id` 是 `my-pig`，图片就叫 `my-pig.png`。
-- 多放几张也没关系——模组只在真正需要显示时才加载，不会一次性把几百张图全塞进显存。
+- **It must be a real PNG.** This is the most common pitfall: browser "Save as" often gives you webp / gif / avif, and renaming the extension to `.png` does not help — the game only accepts PNG bytes.
+  - First check: open it with the system image viewer. If it opens, the format is at least common, but the safer move is to **save it again as PNG** and use that.
+  - Second check: look at the file header. A PNG starts with the 8 bytes `89 50 4E 47 0D 0A 1A 0A`; if you see `47 49 46 38` (`GIF8`) or `52 49 46 46` (`RIFF`, webp) it is not a PNG.
+  - Third check: read the log. On failure the mod prints `无法加载猪猪图片 xxx：只支持真正的 PNG 文件` together with the full path it was looking at.
+- Any size is fine; the image is scaled **proportionally** and centered inside the box, so it is never squashed. **240×240 or 512×512 square** is recommended; very wide or very tall images look small inside the 48×48 box.
+- **A transparent background (RGBA) is recommended.** An opaque white square is very visible against the dark GUI.
+- One picture per id, file name must match: if `id` is `my-pig`, the picture is `my-pig.png`.
+- Having lots of pictures is fine — the mod only loads them when they actually need to be displayed, so hundreds of images are not dumped into VRAM at once.
 
-### 4. 替换内置猪
+### 4. Replacing a built-in pig
 
-只想改文案或换图、不想新增 id，就直接**用同名 id 覆盖**内置猪：
+If you only want to change the text or swap the picture without adding a new id, simply **override with the same id**:
 
 ```json
 // config/roll_pig/pigsty/pig.json
-{ "id": "pig", "name": "猪", "description": "普通小猪", "analysis": "……" }
+{ "id": "pig", "name": "Pig", "description": "Ordinary little pig", "analysis": "……" }
 ```
 
-再把 `config/roll_pig/image/pig.png` 放进去，就替换掉了内置那只「猪」。收集记录是按 id 记的，玩家原来的次数不会丢。
+Then drop `config/roll_pig/image/pig.png` in place to replace the built-in "Pig". Progress is tracked by id, so players keep their existing counts.
 
-内置猪的 id 就是 jar 里 `data/roll_pig/pigsty/*.json` 的文件名（一共 165 只）。想确认某只的 id，看游戏里猪圈界面的名字，或者解压 jar 看文件名。
+A built-in pig's id is the file name under `data/roll_pig/pigsty/*.json` inside the jar (165 pigs in total). To check a specific id, look at the name in the in-game pigpen, or unzip the jar and read the file names.
 
-### 5. 聊天里的图到底从哪来
+### 5. Where the chat images actually come from
 
-这里最容易搞混，单独说清楚。模组在聊天里用到两种完全不同的东西：
+This is the most confusing part, so it gets its own section. The mod uses two completely different things in chat:
 
-**贴纸（直接贴图）** —— 你发 `[猪猪名]`，消息里会插入一个 12×12 的特殊字位，客户端渲染到那个位置时把**原图纹理**画上去。所以：
+**Stickers (inline pictures)** — when you send `[pig name]`, a special 12×12 character slot is inserted into the message, and the client draws the **original picture texture** at that position. Therefore:
 
-- 用的是 `config/roll_pig/image/<id>.png` 原图。
-- 只要客户端有这张图就能显示，**不需要资源包**。
-- 只对**已收集**的猪生效。
+- It uses the original `config/roll_pig/image/<id>.png`.
+- It shows up as long as the client has that file; **no resource pack needed**.
+- It only works for **collected** pigs.
 
-**卡片头像（字体字形）** —— `【xxx 的今日猪猪】` 那张卡左上角 36 像素的图。Minecraft 的聊天栏画不了任意图片，只能画**字体里的字形**，所以模组做了一张 `pig_icons.png` 图集（13×13 个 64×64 的格子），每个格子注册成一个私用区字符，卡片里放的就是「那个字符」。
+**Card portrait (font glyph)** — the 36-pixel picture in the top-left of the `【xxx's Today's Pig】` card. Minecraft's chat cannot draw arbitrary images, only **glyphs from a font**, so the mod ships an atlas `pig_icons.png` (13×13 cells of 64×64), each cell registered as a Private Use Area character, and the card contains "that character".
 
-- 它走的是**字体**，不是纹理，所以客户端必须能读到对应的字形。
-- 模组自带的图集只画了内置的 165 只猪，新加的猪不在里面 → 默认退回**灰色通用猪头**（图集里预留的占位格）。
-- 想让新猪有自己的卡片头像，就得**换一张图集**（资源包）并在**对照表**里登记 id → 格子。
+- It goes through the **font**, not a texture, so the client must be able to resolve that glyph.
+- The bundled atlas only covers the 165 built-in pigs; newly added pigs are not in it → they fall back to the **generic grey pig head** (a reserved placeholder cell).
+- To give a new pig its own card portrait you must **replace the atlas** (resource pack) and register id → cell in the **lookup table**.
 
-取舍很清楚：**贴纸随便加，卡片头像要额外打包。** 如果一整套整合包的猪都要有自己的卡片头像，用第 6 节的脚本；只加两三只、又想手动画，看第 7 节。
+The trade-off is clear: **stickers are free to add, card portraits need extra packaging.** If a whole modpack's pigs need their own portraits, use the script in section 6; if you only add two or three and want to draw by hand, see section 7.
 
-### 6. 让自定义猪有卡片头像（推荐：跑一条命令）
+### 6. Give custom pigs a card portrait (recommended: one command)
 
-工具在模组的 `tools/make_pig_pack.py`。它会：
+The tool is `tools/make_pig_pack.py` in the mod. It will:
 
-1. 从 jar 里取出内置图集和对照表；
-2. 把 `config/roll_pig/image/` 里所有「不在内置对照表里」的新猪，逐张缩放成 64×64，追加到图集后面；
-3. 重新排布成正方形图集，给新格子分配 `U+E000` 之后的码位（内置格子编号不变）；
-4. 输出一个**资源包目录**，同时写好 `config/roll_pig/pig_glyphs.json`。
+1. read the built-in atlas and lookup table from the jar;
+2. take every new pig under `config/roll_pig/image/` that is not in the built-in table, scale each to 64×64 and append it after the atlas;
+3. relayout the atlas into a square, assigning the new cells codepoints after `U+E000` (built-in cell numbers stay unchanged);
+4. output a **resource pack directory** and write `config/roll_pig/pig_glyphs.json`.
 
-**第 1 步：确认猪都在。** 先把新猪的 json 和图片放进 `config/roll_pig/`（第 1 节那套），启动一次确认日志里数量对得上。
+**Step 1: make sure the pigs are there.** Put the new pigs' json and pictures into `config/roll_pig/` (as in section 1) and launch once to confirm the count in the log is right.
 
-**第 2 步：跑脚本。** 在模组目录下执行（Windows 命令提示符或 PowerShell 都一样）：
+**Step 2: run the script.** From the mod directory (Windows Command Prompt or PowerShell, same thing):
 
 ```bash
 python tools/make_pig_pack.py --jar mods/roll_pig-1.0.0-mc1.21.1-neoforge.jar --extra config/roll_pig --pack resourcepacks/roll_pig_custom
 ```
 
-参数含义：
+What the arguments mean:
 
-- `--jar` —— 模组 jar 的路径，脚本要从里面读内置图集。
-- `--extra` —— 你放自定义猪的目录，里面要有 `pigsty/` 和 `image/`。
-- `--pack` —— 资源包输出目录，脚本会新建。
-- `--config` —— 可选，对照表输出目录，默认就是 `--extra`。
+- `--jar` — path to the mod jar; the script reads the built-in atlas from it.
+- `--extra` — the directory holding your custom pigs; it must contain `pigsty/` and `image/`.
+- `--pack` — resource pack output directory; the script creates it.
+- `--config` — optional, output directory for the lookup table; defaults to `--extra`.
 
-正常输出类似：
+Typical output:
 
 ```
 资源包: resourcepacks/roll_pig_custom
@@ -197,136 +199,136 @@ python tools/make_pig_pack.py --jar mods/roll_pig-1.0.0-mc1.21.1-neoforge.jar --
   test-pig                 U+E0A9
 ```
 
-读法：内置 169 格原样保留，你的猪从第 170 格开始；对照表里多了一条 `test-pig → U+E0A9`，这就是它在图集里的字符。
+How to read it: the 169 built-in cells are kept as-is, your pigs start at cell 170; the table gained an entry `test-pig → U+E0A9`, which is its character in the atlas.
 
-**第 3 步：装资源包。** 把整个 `roll_pig_custom` 文件夹放进游戏的 `resourcepacks/`，然后在「选项 → 资源包」里启用它（左侧列表里点箭头挪到右侧）。改过图之后按 `F3 + T` 重载资源包即可，不用重启游戏。
+**Step 3: install the resource pack.** Put the whole `roll_pig_custom` folder into the game's `resourcepacks/`, then enable it in "Options → Resource Packs" (click the arrow to move it to the right-hand list). After changing images, press `F3 + T` to reload resource packs; no game restart needed.
 
-**第 4 步：放对照表。** 脚本已经把 `config/roll_pig/pig_glyphs.json` 写好了。**客户端和服务器都要有这同一份**（卡片文字是服务端拼的，字形是客户端画的，两边码位必须一致）。
+**Step 4: place the lookup table.** The script already wrote `config/roll_pig/pig_glyphs.json`. **Both the client and the server need the same copy** (the card text is composed on the server while the glyph is drawn on the client, and the codepoints must match).
 
-**第 5 步：重启并验证。**
+**Step 5: restart and verify.**
 
-- 启动日志多一行：`扩展头像对照表: 167 条（新增 1）`。看到它说明对照表被读到了。
-- 抽一只自定义猪，看卡片左上角是不是它自己的头像。
-- 如果日志有这行、头像还是灰的：资源包没启用，或者资源包里图集路径不对。
+- The startup log gains a line: `扩展头像对照表: 167 条（新增 1）`. Seeing it means the table was read.
+- Roll a custom pig and check whether the card's top-left shows its own portrait.
+- If the line is there but the portrait is still grey: the resource pack is not enabled, or the atlas path inside the pack is wrong.
 
-**第 6 步：以后增删猪怎么办。** 每次改完 `config/roll_pig/` 就重跑一次脚本，重新启用一次资源包（`F3 + T`），重启服务器。脚本每次都是**全量重算**，不会叠加出错，但这也意味着：**它会把 `pig_glyphs.json` 整个重写**，你手写的内容会被覆盖，别和手画混着用。
+**Step 6: what about adding or removing pigs later?** Every time you change `config/roll_pig/`, re-run the script, re-enable the resource pack (`F3 + T`) and restart the server. The script always **recomputes everything**, so it cannot accumulate errors — but that also means **it rewrites `pig_glyphs.json` wholesale**, overwriting anything you wrote by hand. Do not mix script and hand-drawn workflows.
 
-### 7. 手画图集（进阶，不跑脚本）
+### 7. Drawing the atlas by hand (advanced, no script)
 
-图集就是一张**按网格排的 PNG**，没有魔法，自己画完全合法。规则三条：
+The atlas is just **a PNG arranged on a grid** — there is no magic, and drawing it yourself is perfectly valid. Three rules:
 
-1. 图集是 **64×64 的格子**，宽高都必须能被 64 整除；格子按「从左到右、从上到下」编号。
-2. `pig_icons.json` 里的 `chars` 是字符串数组：**第几行对应第几排格子，一行里第几个字符对应第几格**；每行长度必须等于列数。
-3. `pig_glyphs.json` 把「猪的 id」映射到「某一格里的那个字符」。
+1. The atlas is made of **64×64 cells**; width and height must both be divisible by 64; cells are numbered "left to right, top to bottom".
+2. `chars` in `pig_icons.json` is an array of strings: **the n-th string is the n-th row of cells, and the n-th character in a row is the n-th cell**; every row must be as long as the number of columns.
+3. `pig_glyphs.json` maps "pig id" to "the character in some cell".
 
-**内置图集留了 3 个空格子，可以白嫖。** 图集是 13×13 = 169 格：0–164 是 165 只内置猪，165 是通用灰色头，**166、167、168 三格是空的**，而且字符已经预先分配好：
+**The built-in atlas leaves 3 free cells you can use for nothing.** The atlas is 13×13 = 169 cells: 0–164 are the 165 built-in pigs, 165 is the generic grey head, and **cells 166, 167 and 168 are empty**, with characters already reserved:
 
 ```
-第 166 格 → U+E1A6 (57766)，左上角像素 (640, 768)
-第 167 格 → U+E1A7 (57767)，左上角像素 (704, 768)
-第 168 格 → U+E1A8 (57768)，左上角像素 (768, 768)
+cell 166 → U+E1A6 (57766), top-left pixel (640, 768)
+cell 167 → U+E1A7 (57767), top-left pixel (704, 768)
+cell 168 → U+E1A8 (57768), top-left pixel (768, 768)
 ```
 
-所以手画 1–3 只，**连 `pig_icons.json` 都不用改**：
+So for 1–3 hand-drawn pigs, **you don't even have to touch `pig_icons.json`**:
 
-1. 从 jar 里取出 `assets/roll_pig/textures/font/pig_icons.png`（jar 就是 zip，解压工具都能打开）。
-2. 在像素 `(640, 768)` 处贴上你的 64×64 图。不缩放、不移动网格线。
-3. 建资源包，只放这一张图：`roll_pig_custom/assets/roll_pig/textures/font/pig_icons.png`。字体定义不用放，直接用 jar 里的。`pack.mcmeta` 里 `pack_format` 填 `34`（1.21.1）。
-4. 在 `config/roll_pig/pig_glyphs.json` 里加一条 `{ "my-pig": 57766 }`。
-5. 猪本身的 json 和图片照常放。
+1. Extract `assets/roll_pig/textures/font/pig_icons.png` from the jar (a jar is a zip; any unzip tool opens it).
+2. Paste your 64×64 picture at pixel `(640, 768)`. Do not rescale, do not move the grid lines.
+3. Create a resource pack containing only that file: `roll_pig_custom/assets/roll_pig/textures/font/pig_icons.png`. No font definition needed — the one inside the jar is used. Set `pack_format` to `34` (1.21.1) in `pack.mcmeta`.
+4. Add an entry `{ "my-pig": 57766 }` to `config/roll_pig/pig_glyphs.json`.
+5. Place the pig's own json and picture as usual.
 
-**超过 3 只就得改 `pig_icons.json`**：加一排格子（高度 +64）、在 `chars` 里加一行等长字符、给新格子分配没用过的码位（接着用 `U+E1A9`、`U+E1AA`……，都在私用区内就行），再到对照表里指过去。
+**More than 3 pigs means editing `pig_icons.json`**: add a row of cells (height +64), add an equally long line of characters to `chars`, assign unused codepoints to the new cells (continue with `U+E1A9`, `U+E1AA`, … — anything inside the Private Use Area), and point the lookup table at them.
 
-改完跑一遍检查，它会把问题指出来：
+After editing, run the checker; it will point out problems:
 
 ```bash
 python tools/check_pig_font.py --pack resourcepacks/roll_pig_custom --config config/roll_pig
 ```
 
-它检查：图集尺寸是否 64 的整数倍、`chars` 每行宽度、字符是否重复、码位是否都在私用区、对照表里每条 id 指向的格子存不存在、是不是空的，以及 `pigsty/` 里有没有对应 json。全部通过时打印「全部检查通过」。
+It checks: whether the atlas size is a multiple of 64, the width of each `chars` row, duplicate characters, whether all codepoints are inside the Private Use Area, whether every id in the lookup table points at an existing and non-empty cell, and whether the matching json exists under `pigsty/`. When everything passes it prints "all checks passed".
 
-### 8. 码位为什么从 57344 开始
+### 8. Why codepoints start at 57344
 
-`57344` = `U+E000`，是 Unicode **私用区（Private Use Area，U+E000–U+F8FF）** 的起点。这段码位被标准永久保留给私有用途，永远不会分配给真实文字，所以拿它们当「图片字符」不会和任何语言、任何模组撞车。
+`57344` = `U+E000`, the start of Unicode's **Private Use Area (U+E000–U+F8FF)**. These codepoints are permanently reserved by the standard for private use and will never be assigned to real text, so using them as "picture characters" cannot collide with any language or any other mod.
 
-模组不按顺序硬编码，而是用 `pig_glyphs.json` 查表（id → 码位），这样以后增删猪、图集重排时，旧存档里的图标不会错位。内置那份在 jar 里，你的那份在 `config/roll_pig/pig_glyphs.json`，读取时会**覆盖同名、追加新的**到内置表上。
-
----
-
-## 注意事项
-
-- **目录不用自己建。** 启动时会自动生成 `config/roll_pig/pigsty`、`config/roll_pig/image`，并写一份 `README.txt`；日志里出现「已创建自定义猪猪目录」就说明建好了。
-- **改完一定要重启。** 猪猪资料只在启动时读一次；图片是进世界时加载的，加完图片要重进存档或重启客户端（纹理有缓存）。只有资源包可以用 `F3 + T` 热重载。
-- **两个目录别搞混。** `config/roll_pig/pigsty/` 只放 `.json`，`config/roll_pig/image/` 只放 `.png`。
-- **图片必须是真 PNG。** gif / jpg / webp 改扩展名不行，日志会报 `只支持真正的 PNG 文件`。
-- **`id` 用小写英文。** 中文或大写会在内部被转成下划线，图片文件名会跟着变，很难对账。
-- **文件名 = id。** 差一个字母就是「有名字没图」。
-- **同名会覆盖内置猪。** 自定义优先，并且是按 id 覆盖，不是按显示名。
-- **单机和联机的分工不一样**（列表按「放哪、放什么」看）：
-  - 单人游戏：`config/roll_pig/` 里 json + 图片都要有。
-  - 服务器：**服务端**必须有 `pigsty/*.json`（抽奖池和文案在这里）；**客户端**必须有 `image/*.png` 和同样的 `pigsty/*.json`（GUI 和贴纸要本地图）。
-  - 聊天卡片头像：两端都要有 `pig_glyphs.json`，客户端还要启用资源包。
-- **别把「手画图集」和「跑脚本」混用。** 脚本会整份重写对照表，覆盖你手写的条目。
-- **删掉一只猪不会清存档。** 玩家收集记录按 id 存在存档里，猪删了记录还在；把猪加回来还认。
-- **大批量不用担心显存。** GUI 只加载当前翻到的几页图片；但字体图集是一整张图，猪总数超过 169 只时要加一列，图集从 832×832 变成 896×832，显存只多一百多 KB。
+The mod does not hardcode an order; it looks things up in `pig_glyphs.json` (id → codepoint), so adding or removing pigs and relaying out the atlas never scrambles icons in existing saves. The built-in table lives in the jar, yours lives in `config/roll_pig/pig_glyphs.json`, and when reading they are merged: **same id overrides, new ids are appended** to the built-in table.
 
 ---
 
-## 常见问题 QA
+## Notes
 
-**Q：我把 json 和图片都放好了，游戏里却没有这只猪？**
-A：按顺序排查：① 是否放在 `config/roll_pig/pigsty/`（不是 `image/`，也不是模组源码目录）；② 扩展名是不是真的 `.json`（Windows 常隐藏扩展名，容易变成 `my-pig.json.txt`）；③ 有没有重启；④ 看日志「猪圈里共 N 只猪猪」，数字没变就是没读到，搜 `读取自定义猪猪资料失败` 看具体报错。
-
-**Q：名字和文案都有，图却是个问号方块？**
-A：图片不是真正的 PNG。最常见的是从网页存下来的 gif / webp，被改成了 `.png`。用系统「画图」或 Photoshop 打开后「另存为 PNG」就行，任何能转格式的工具都可以。日志里会有 `无法加载猪猪图片 xxx：只支持真正的 PNG 文件` 并带上完整路径。
-
-**Q：图片显示成灰色方块而不是问号？**
-A：灰色方块是「图集里没有这只猪」的通用头，属于**聊天卡片**的降级表现，不是图片问题。走第 6 节做资源包即可。
-
-**Q：图片被拉扁 / 变形了？**
-A：现在是按比例缩放居中，不会变形。如果你看到变形，说明用的是旧版本 jar，换最新的。非正方形图在方框里会留白，想要满框就裁成正方形。
-
-**Q：我改了 json 里的文案，进游戏没变化？**
-A：没重启。资料启动时读一次，改完重启服务器 / 客户端。
-
-**Q：中文显示成乱码？**
-A：文件不是 UTF-8。用 VS Code / Notepad++ 另存为 UTF-8（无 BOM 更稳）。
-
-**Q：聊天卡片左上角还是那个灰色通用头？**
-A：说明对照表里没有这只猪，或者资源包没启用。分两种：只放资源包不放对照表 → 灰色头；只放对照表不放资源包 → 空白（字体里没这个字形）。
-
-**Q：头像错位了，显示成另一只猪的头？**
-A：客户端和服务器的 `pig_glyphs.json` 不是同一份。两边必须完全一致，重跑脚本后两处都替换。
-
-**Q：聊天里发 `[猪猪名]` 没有变成图？**
-A：三个原因：① 名字打错（要完全等于 `name`）；② 这只猪你还没收集到（贴纸只对已收集的猪生效，可以用 `/rollpig unlock` 解锁）；③ 客户端没有对应的 `image/<id>.png`。
-
-**Q：贴纸面板里找不到新猪？**
-A：面板只列出**已收集**的猪。用 `/rollpig unlock` 解锁，或者抽到它。
-
-**Q：加了 50 只猪，难道要给 50 只都做资源包？**
-A：是的，但要做的只有「卡片头像」这一件事，跑一次脚本就全解决了，`--extra` 指向整个 `config/roll_pig` 目录即可，不用一只一只来。
-
-**Q：资源包放进去没生效？**
-A：检查三点：① 目录层级必须是 `roll_pig_custom/assets/roll_pig/textures/font/pig_icons.png`（多套一层或少了 `assets` 都不行）；② `pack.mcmeta` 里的 `pack_format` 是 `34`（1.21.1）；③ 在「选项 → 资源包」里**真的启用**了（挪到右侧列表），改完按 `F3 + T`。
-
-**Q：概率是平均的吗？怎么老是抽到同一只？**
-A：全库等概率、可重复抽到。抽到过的猪不会降低权重，记录里显示的 `已收集 ×N` 只是次数统计。
-
-**Q：删掉一只自定义猪，玩家的记录会怎样？**
-A：记录按 id 留在存档里，只是不再出现在抽奖池和界面；把同 id 的 json 加回来，次数还在。
-
-**Q：能不能不重启就加猪？**
-A：不行。抽奖池在启动时构建（服务端），图片也在进世界时加载（客户端）。资源包可以热重载，其余都要重启。
+- **You don't have to create the directories.** On startup `config/roll_pig/pigsty` and `config/roll_pig/image` are created, along with a `README.txt`; if the log says "已创建自定义猪猪目录", they are ready.
+- **Restart after every change.** Pig data is read once at startup; pictures are loaded when entering a world, so re-enter the save or restart the client after adding pictures (textures are cached). Only resource packs can be hot-reloaded with `F3 + T`.
+- **Do not mix up the two directories.** `config/roll_pig/pigsty/` holds only `.json`, `config/roll_pig/image/` holds only `.png`.
+- **Pictures must be real PNGs.** Renaming gif / jpg / webp does not work; the log will say `只支持真正的 PNG 文件`.
+- **Use lowercase ASCII for `id`.** Chinese or uppercase gets turned into underscores internally, which changes the picture file name and makes bookkeeping painful.
+- **File name = id.** One letter off and you get "a name without a picture".
+- **Same id overrides a built-in pig.** Custom pigs win, and the override is by id, not by display name.
+- **Single player and multiplayer differ** (listed as "where to put what"):
+  - Single player: both the json and the pictures must be in `config/roll_pig/`.
+  - Server: the **server** must have `pigsty/*.json` (the roll pool and the text live there); the **client** must have `image/*.png` and the same `pigsty/*.json` (the GUI and stickers need local pictures).
+  - Chat card portraits: both sides need `pig_glyphs.json`, and the client must enable the resource pack.
+- **Do not mix "hand-drawn atlas" with "run the script".** The script rewrites the whole lookup table, overwriting your hand-written entries.
+- **Deleting a pig does not clear saves.** Progress is stored by id; remove a pig and the record stays, add it back and it is recognized again.
+- **Large collections are cheap on VRAM.** The GUI only loads the few pages you are looking at; the font atlas, however, is a single image — beyond 169 pigs one more column is added, growing it from 832×832 to 896×832, which costs just over a hundred KB.
 
 ---
 
-## 给模组开发者：API
+## FAQ
 
-`com.chinaex123.roll_pig.api.RollPigApi` 提供了静态门面（写操作请在**服务端主线程**传 `ServerPlayer`）：
+**Q: I put the json and the picture in place, but the pig is not in game?**
+A: Check in order: ① is it in `config/roll_pig/pigsty/` (not `image/`, not the mod source tree); ② is the extension really `.json` (Windows hides extensions, so it easily becomes `my-pig.json.txt`); ③ did you restart; ④ look at the log line "猪圈里共 N 只猪猪" — if the number did not change it was not read, so search for `读取自定义猪猪资料失败` to see the actual error.
+
+**Q: The name and text are there, but the picture is a question-mark block?**
+A: The picture is not a real PNG. Most often it is a gif / webp saved from a web page and renamed to `.png`. Open it in the system image viewer or Photoshop and "Save As PNG" — any converter works. The log will contain `无法加载猪猪图片 xxx：只支持真正的 PNG 文件` with the full path.
+
+**Q: The picture shows as a grey block instead of a question mark?**
+A: The grey block is the generic head used when "the atlas has no such pig" — that is the **chat card** fallback, not a picture problem. Follow section 6 to build a resource pack.
+
+**Q: The picture is squashed / distorted?**
+A: It is now scaled proportionally and centered, so it cannot distort. If you see distortion you are on an old jar — update. Non-square images are letterboxed inside the box; crop to a square if you want it to fill.
+
+**Q: I changed the text in the json but nothing changed in game?**
+A: You did not restart. Data is read once at startup; restart the server / client after editing.
+
+**Q: Chinese shows up as garbled text?**
+A: The file is not UTF-8. Re-save it as UTF-8 in VS Code / Notepad++ (no BOM is safer).
+
+**Q: The chat card's top-left is still the generic grey head?**
+A: The lookup table has no entry for that pig, or the resource pack is not enabled. Two cases: pack without table → grey head; table without pack → blank (the font has no such glyph).
+
+**Q: The portrait is wrong — it shows another pig's head?**
+A: The client's and the server's `pig_glyphs.json` are not the same file. Both must be identical; after re-running the script replace both.
+
+**Q: Sending `[pig name]` in chat does not turn into a picture?**
+A: Three causes: ① the name is misspelled (it must equal `name` exactly); ② you have not collected that pig (stickers only work for collected pigs — use `/rollpig unlock`); ③ the client lacks the matching `image/<id>.png`.
+
+**Q: The sticker picker does not list my new pig?**
+A: The picker only lists **collected** pigs. Unlock with `/rollpig unlock`, or roll it.
+
+**Q: I added 50 pigs — do I have to make resource packs for all 50?**
+A: Yes, but the only thing needed is the "card portrait", and one script run handles all of them: point `--extra` at the whole `config/roll_pig` directory, no one-by-one work.
+
+**Q: The resource pack does not take effect?**
+A: Check three things: ① the hierarchy must be `roll_pig_custom/assets/roll_pig/textures/font/pig_icons.png` (one level too many, or a missing `assets`, breaks it); ② `pack_format` in `pack.mcmeta` is `34` (1.21.1); ③ it is **actually enabled** in "Options → Resource Packs" (moved to the right-hand list), and press `F3 + T` afterwards.
+
+**Q: Are the chances uniform? Why do I keep getting the same pig?**
+A: Uniform across the whole pool, duplicates allowed. Pigs you already own do not get a lower weight; the `Collected ×N` in the record is just a tally.
+
+**Q: What happens to player records if I delete a custom pig?**
+A: The record stays in the save keyed by id, it just no longer appears in the pool or the GUI; add a json with the same id back and the count is still there.
+
+**Q: Can I add pigs without restarting?**
+A: No. The roll pool is built at startup (server side) and pictures are loaded on world join (client side). Resource packs can be hot-reloaded; everything else needs a restart.
+
+---
+
+## For mod developers: API
+
+`com.chinaex123.roll_pig.api.RollPigApi` provides a static facade (perform writes on the **server main thread**, passing a `ServerPlayer`):
 
 ```java
-// 查询
+// queries
 List<Pig> all = RollPigApi.pigs();
 Optional<Pig> pig = RollPigApi.pig("pig");
 int count = RollPigApi.countOf(player, "pig");
@@ -334,28 +336,28 @@ int total = RollPigApi.total(player);
 boolean can = RollPigApi.canRoll(player);
 long ticks = RollPigApi.ticksUntilReset(level);
 
-// 操作
-RollResult result = RollPigApi.roll(serverPlayer);        // 正常抽一次（消耗当天次数）
-RollResult forced = RollPigApi.forceRoll(serverPlayer);   // 强制抽一次（不消耗次数）
-RollPigApi.rollAndNotify(serverPlayer);                  // 抽 + 发卡片
-RollPigApi.openScreen(serverPlayer);                     // 打开猪圈 GUI
+// actions
+RollResult result = RollPigApi.roll(serverPlayer);        // normal roll (consumes today's chance)
+RollResult forced = RollPigApi.forceRoll(serverPlayer);   // forced roll (consumes nothing)
+RollPigApi.rollAndNotify(serverPlayer);                  // roll + send the card
+RollPigApi.openScreen(serverPlayer);                     // open the pigpen GUI
 RollPigApi.setCount(player, "pig", 10);
 RollPigApi.clearCounts(player);
 RollPigApi.resetDaily(player);
 
-// 解锁与同步
-int newly = RollPigApi.unlockAll(player);                 // 全部猪补到至少 1 次，返回新解锁只数
-int got = RollPigApi.collected(player);                  // 已收集只数
-RollPigApi.sync(serverPlayer);                           // 把收集情况推给客户端（不开界面）
+// unlocking and syncing
+int newly = RollPigApi.unlockAll(player);                 // bump every pig to at least 1; returns how many were new
+int got = RollPigApi.collected(player);                  // number of collected pigs
+RollPigApi.sync(serverPlayer);                           // push progress to the client (without opening the GUI)
 ```
 
-抽奖前后会各发一个事件（挂在 `NeoForge.EVENT_BUS`）：
+An event is fired before and after each roll (on `NeoForge.EVENT_BUS`):
 
 ```java
 @SubscribeEvent
 public static void onPreRoll(RollPigEvent.Pre event) {
     if (event.getPlayer().getGameMode() == GameType.SPECTATOR) {
-        event.setCanceled(true);   // 拦截：不消耗次数，也不发结果
+        event.setCanceled(true);   // veto: consumes no chance and sends no result
     }
 }
 
@@ -366,50 +368,50 @@ public static void onPostRoll(RollPigEvent.Post event) {
 }
 ```
 
-`RollResult` 是 `record(boolean success, Pig pig, Reason reason)`，`Reason` 取值 `SUCCESS`、`ALREADY_ROLLED`、`NO_PIGS`、`CANCELLED`。
+`RollResult` is `record(boolean success, Pig pig, Reason reason)`, and `Reason` is one of `SUCCESS`, `ALREADY_ROLLED`, `NO_PIGS`, `CANCELLED`.
 
 ---
 
-## 项目结构
+## Project layout
 
 ```
 src/main/java/com/chinaex123/roll_pig/
-├─ api/          RollPigApi、RollPigEvent、RollResult —— 对外接口
+├─ api/          RollPigApi, RollPigEvent, RollResult — public API
 ├─ client/
-│  ├─ chat/      PigChatTokens、PigChatRenderer、ChatPigPanel、RPChatEvents —— 聊天贴纸
-│  ├─ gui/       PigPenScreen（猪圈界面）、PigTextures（纹理缓存）
-│  ├─ ClientPigData            客户端收集情况缓存
-│  └─ RPClientPayloadHandler   处理服务端下发的界面/同步包
-├─ command/      RPCommands —— /rollpig、/今日猪猪
-├─ config/       RPConfig —— 公共配置
-├─ data/         ModDataGenerator、ModItemModelsProvider —— 数据生成
-├─ data/state/   PigRegistry（读猪猪资料）、RollPigState（收集进度）、RPGlyphs（字体图标）
-├─ event/        RollPigService（抽奖核心）、RPChatQueue（延迟发卡片）、
-│                RPDayWatcher（天亮推送）、RPPlayerSync（进服同步）
-├─ init/         RPAttachments、RPCreativeTabs、RPItems
-├─ item/         PigPenItem —— 「猪圈」物品
-├─ mixin/        ChatComponentMixin、ChatScreenMixin —— 聊天内联图片
-├─ network/      RPNetwork、PigPenPayload、RollRequestPayload
-└─ util/         Pig（数据模型）、RPChatCard（卡片排版）
+│  ├─ chat/      PigChatTokens, PigChatRenderer, ChatPigPanel, RPChatEvents — chat stickers
+│  ├─ gui/       PigPenScreen (pigpen GUI), PigTextures (texture cache)
+│  ├─ ClientPigData            client-side progress cache
+│  └─ RPClientPayloadHandler   handles screen/sync packets from the server
+├─ command/      RPCommands — /rollpig, /今日猪猪
+├─ config/       RPConfig — common config
+├─ data/         ModDataGenerator, ModItemModelsProvider — data generation
+├─ data/state/   PigRegistry (reads pig data), RollPigState (progress), RPGlyphs (font icons)
+├─ event/        RollPigService (roll logic), RPChatQueue (delayed card),
+│                RPDayWatcher (dawn notification), RPPlayerSync (sync on join)
+├─ init/         RPAttachments, RPCreativeTabs, RPItems
+├─ item/         PigPenItem — the "Pigpen" item
+├─ mixin/        ChatComponentMixin, ChatScreenMixin — inline chat images
+├─ network/      RPNetwork, PigPenPayload, RollRequestPayload
+└─ util/         Pig (data model), RPChatCard (card layout)
 
 src/main/resources/
-├─ data/roll_pig/pigsty/                    165 只猪的资料
+├─ data/roll_pig/pigsty/                    165 pigs' data
 └─ assets/roll_pig/
-   ├─ textures/pigsty/image/                165 张立绘
-   ├─ textures/font/pig_icons.png           聊天图标图集
-   ├─ font/pig_icons.json                   字体定义（bitmap provider）
-   ├─ font/card_indent.json                 卡片缩进用的空白字符
-   ├─ pig_glyphs.json                       id → 码位 对照表
+   ├─ textures/pigsty/image/                165 portraits
+   ├─ textures/font/pig_icons.png           chat icon atlas
+   ├─ font/pig_icons.json                   font definition (bitmap provider)
+   ├─ font/card_indent.json                 blank glyph used for card indentation
+   ├─ pig_glyphs.json                       id → codepoint lookup table
    └─ lang/                                 zh_cn / en_us
 
 tools/
-├─ gen_pig_font.py     重画内置图集（改了 jar 内猪列表时用）
-├─ make_pig_pack.py    给整合包生成自定义猪资源包 + 对照表
-└─ check_pig_font.py   校验手工改过的图集/字体/对照表
+├─ gen_pig_font.py     redraw the built-in atlas (when the in-jar pig list changes)
+├─ make_pig_pack.py    build a custom pig resource pack + lookup table for modpacks
+└─ check_pig_font.py   validate a hand-edited atlas / font / lookup table
 ```
 
 ---
 
-## 许可
+## License
 
 All Rights Reserved.

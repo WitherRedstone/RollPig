@@ -38,7 +38,10 @@ public final class PigRegistry {
     public static final String IMAGE_DIR = "assets/roll_pig/textures/pigsty/image";
     public static final String CUSTOM_PATH = "roll_pig";
 
-    private static final String GUIDE = """
+    private static final String GUIDE_HEADER_ZH = "Roll Pig —— 自定义猪猪目录";
+    private static final String GUIDE_HEADER_EN = "Roll Pig - Custom Pig Directory";
+
+    private static final String GUIDE_ZH = """
             Roll Pig —— 自定义猪猪目录
             ==========================
 
@@ -55,6 +58,27 @@ public final class PigRegistry {
             详细步骤见模组 README 的「自定义猪猪」章节。
             这个说明文件是自动生成的，删掉下次启动还会再写一份。
             """;
+
+    private static final String GUIDE_EN = """
+            Roll Pig - Custom Pig Directory
+            ===============================
+
+            pigsty/   one .json per pig; fields: id / name / description / analysis
+            image/    the picture; file name must match the id in the json; must be a real PNG
+
+            Example:
+              pigsty/my-pig.json
+              image/my-pig.png
+
+            Restart the game (single player) or the server (multiplayer) after editing.
+            The client also needs the same pigsty/*.json and image/*.png to see the text and the picture.
+
+            See the "Custom pigs" section of the mod README for the full walkthrough.
+            This file is generated automatically; delete it and it is recreated on the next launch.
+            """;
+
+    /** 中文在上、英文在下，一份文件两种语言都能看。 */
+    private static final String GUIDE = GUIDE_ZH + "\n--------------------------------------------------------------------------------\n\n" + GUIDE_EN;
 
     private static volatile List<Pig> cache;
 
@@ -135,7 +159,8 @@ public final class PigRegistry {
                 }
             }
             Path guide = root.resolve("README.txt");
-            if (!Files.isRegularFile(guide)) {
+            String existing = Files.isRegularFile(guide) ? Files.readString(guide, StandardCharsets.UTF_8) : null;
+            if (existing == null || (isGeneratedGuide(existing) && !existing.equals(GUIDE))) {
                 Files.writeString(guide, GUIDE, StandardCharsets.UTF_8);
             }
             if (created) {
@@ -144,6 +169,10 @@ public final class PigRegistry {
         } catch (IOException exception) {
             RollPig.LOGGER.warn("无法创建自定义猪猪目录: {}", root, exception);
         }
+    }
+
+    private static boolean isGeneratedGuide(String content) {
+        return content.startsWith(GUIDE_HEADER_ZH) || content.startsWith(GUIDE_HEADER_EN);
     }
 
     private static List<Pig> load() {
