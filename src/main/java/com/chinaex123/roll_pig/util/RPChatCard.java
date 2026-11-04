@@ -10,7 +10,7 @@ import net.minecraft.server.level.ServerPlayer;
 public final class RPChatCard {
 
     private static final String INDENT = "         ";
-    private static final String DIVIDER = "=======================================";
+    private static final String DIVIDER = "===============================================";
 
     public static Component build(ServerPlayer player, Pig pig, RollPigState state) {
         MutableComponent card = Component.empty();
@@ -26,8 +26,10 @@ public final class RPChatCard {
         card.append("\n");
 
         card.append(Component.literal(INDENT));
-        card.append(Component.literal(pig.name())
-                .withStyle(ChatFormatting.WHITE, ChatFormatting.BOLD));
+//        card.append(Component.literal(pig.name())
+//                .withStyle(ChatFormatting.WHITE, ChatFormatting.BOLD));
+        card.append(Component.translatable("message.roll_pig.card.name", Component.literal(pig.name())
+                .withStyle(ChatFormatting.WHITE, ChatFormatting.BOLD)));
         card.append("\n");
 
         card.append(Component.literal(INDENT));

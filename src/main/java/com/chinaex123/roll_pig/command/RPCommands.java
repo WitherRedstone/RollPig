@@ -2,6 +2,7 @@ package com.chinaex123.roll_pig.command;
 
 import com.chinaex123.roll_pig.RollPig;
 import com.chinaex123.roll_pig.api.RollResult;
+import com.chinaex123.roll_pig.event.RPChatQueue;
 import com.chinaex123.roll_pig.event.RollPigService;
 import com.chinaex123.roll_pig.network.PigPenPayload;
 import com.mojang.brigadier.CommandDispatcher;
@@ -63,9 +64,15 @@ public final class RPCommands {
                 continue;
             }
             success++;
-            context.getSource().sendSuccess(() -> Component.translatable("message.roll_pig.force.done",
+            Component feedback = Component.translatable("message.roll_pig.force.done",
                     target.getDisplayName(),
-                    Component.literal(result.pig().name())).withStyle(ChatFormatting.GRAY), true);
+                    Component.literal(result.pig().name())).withStyle(ChatFormatting.GRAY);
+            // 等图腾动画和猪猪卡片播完再说结果，不然会抢在动画前面
+            if (context.getSource().getEntity() instanceof ServerPlayer sender) {
+                RPChatQueue.sendLater(sender, feedback, RPChatQueue.DELAY_TICKS);
+            } else {
+                context.getSource().sendSuccess(() -> feedback, false);
+            }
         }
         if (success == 0) {
             context.getSource().sendFailure(Component.translatable("message.roll_pig.force.failed")

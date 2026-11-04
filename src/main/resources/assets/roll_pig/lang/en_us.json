@@ -1,7 +1,8 @@
 {
-  "roll_pig": "Pig of the Day",
   "itemGroup.roll_pig_tab": "Pig of the Day",
+
   "item.roll_pig.pigpen": "Pig Pen",
+
   "gui.roll_pig.title": "Pig Pen",
   "gui.roll_pig.total": "Total ×%s",
   "gui.roll_pig.subtitle": "One pig a day, come and roll",
@@ -14,6 +15,7 @@
   "gui.roll_pig.roll_used": "Used",
   "gui.roll_pig.page": "Page %s / %s",
   "gui.roll_pig.empty": "The pen is empty",
+
   "message.roll_pig.no_chance": "You already rolled today. Come back after dawn.",
   "message.roll_pig.no_pigs": "There is no pig to roll.",
   "message.roll_pig.close_container": "Close the current screen first.",
@@ -22,10 +24,17 @@
   "message.roll_pig.new_day": "The sun is up - today's pig is ready to roll!",
   "message.roll_pig.force.done": "Forced a roll for %s: %s",
   "message.roll_pig.force.failed": "Force roll failed (no pigs loaded, or it was cancelled by another mod)",
-  "roll_pig.configuration.announce_new_day": "Announce new day",
-  "roll_pig.configuration.broadcast_roll": "Broadcast rolls",
+  "message.roll_pig.sticker.unknown": "That pig is not in the pen",
+
   "message.roll_pig.card.title": "[%s's Pig of the Day]",
+  "message.roll_pig.card.name": "Name: %s",
   "message.roll_pig.card.description": "Description: \"%s\"",
   "message.roll_pig.card.collected": "Collected x%s",
-  "message.roll_pig.card.overview": "[Overview]"
+  "message.roll_pig.card.overview": "[Overview]",
+
+  "gui.roll_pig.panel_tip": "Pig Pen: insert a pig sticker",
+  "gui.roll_pig.panel_title": "Pig Pen",
+  "gui.roll_pig.panel_count": "%s collected",
+  "gui.roll_pig.panel_empty": "No pig collected yet",
+  "gui.roll_pig.panel_page": "Page %s / %s"
 }

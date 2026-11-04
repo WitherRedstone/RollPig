@@ -3,6 +3,10 @@
   "package": "com.chinaex123.roll_pig.mixin",
   "compatibilityLevel": "JAVA_21",
   "mixins": [],
+  "client": [
+    "ChatComponentMixin",
+    "ChatScreenMixin"
+  ],
   "injectors": {
     "defaultRequire": 1
   },

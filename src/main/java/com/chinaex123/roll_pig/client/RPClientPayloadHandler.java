@@ -17,6 +17,10 @@ public final class RPClientPayloadHandler {
 
     public static void handle(PigPenPayload payload) {
         Minecraft minecraft = Minecraft.getInstance();
+
+        // 聊天框里的猪圈面板要用到「已解锁了哪些猪」，顺手记下来
+        ClientPigData.update(payload.counts());
+
         switch (payload.mode()) {
             case PigPenPayload.MODE_BROWSE -> minecraft.setScreen(new PigPenScreen(payload));
             case PigPenPayload.MODE_RESULT -> {

@@ -1,7 +1,8 @@
 {
-  "roll_pig": "今日猪猪",
   "itemGroup.roll_pig_tab": "今日猪猪",
+
   "item.roll_pig.pigpen": "猪圈",
+
   "gui.roll_pig.title": "猪圈",
   "gui.roll_pig.total": "总次数 ×%s",
   "gui.roll_pig.subtitle": "今日猪猪，等你来抽",
@@ -14,6 +15,7 @@
   "gui.roll_pig.roll_used": "今日已抽",
   "gui.roll_pig.page": "第 %s / %s 页",
   "gui.roll_pig.empty": "猪圈里还没有猪猪",
+
   "message.roll_pig.no_chance": "今天的猪猪已经抽过了，天亮之后再来吧",
   "message.roll_pig.no_pigs": "猪圈里没有可以抽的猪猪",
   "message.roll_pig.close_container": "请先关闭当前界面",
@@ -22,10 +24,17 @@
   "message.roll_pig.new_day": "天亮了，今天的猪猪可以抽了",
   "message.roll_pig.force.done": "已为 %s 强制抽取：%s",
   "message.roll_pig.force.failed": "强制抽取失败（猪圈里没有猪猪，或被其他模组拦下了）",
-  "roll_pig.configuration.announce_new_day": "天亮提示",
-  "roll_pig.configuration.broadcast_roll": "抽到猪猪时广播",
+  "message.roll_pig.sticker.unknown": "这只猪猪不在猪圈里",
+
   "message.roll_pig.card.title": "【%s 的今日猪猪】",
+  "message.roll_pig.card.name": "猪猪名称：%s",
   "message.roll_pig.card.description": "描述：「%s」",
   "message.roll_pig.card.collected": "已收集 ×%s",
-  "message.roll_pig.card.overview": "【概述】"
+  "message.roll_pig.card.overview": "【概述】",
+
+  "gui.roll_pig.panel_tip": "猪圈：插入猪猪表情",
+  "gui.roll_pig.panel_title": "猪圈",
+  "gui.roll_pig.panel_count": "已收集 %s 只",
+  "gui.roll_pig.panel_empty": "还没有收集到猪猪",
+  "gui.roll_pig.panel_page": "第 %s / %s 页"
 }
