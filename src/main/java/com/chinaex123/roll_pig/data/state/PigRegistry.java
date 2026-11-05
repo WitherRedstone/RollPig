@@ -144,10 +144,6 @@ public final class PigRegistry {
         return customRoot().resolve("image");
     }
 
-    /**
-     * 启动时把 config/roll_pig/pigsty 与 config/roll_pig/image 建好，
-     * 顺便放一份说明文件，省得玩家自己去猜目录结构。
-     */
     public static void ensureCustomDirs() {
         Path root = customRoot();
         try {

@@ -412,6 +412,12 @@ tools/
 
 ---
 
+## 相关链接
+
+灵感来源[RollPig Plus](https://github.com/Felis2026/nonebot-plugin-rollpig-plus)
+
+---
+
 ## 许可
 
 All Rights Reserved.
