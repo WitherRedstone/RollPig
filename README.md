@@ -24,6 +24,8 @@ There are three ways to roll:
 - **`/rollpig` or `/今日猪猪`** — rolls immediately, plays the totem animation and shows the result screen
 - **`/rollpig force [target]`** — for OPs: forces a roll **without** consuming today's chance
 
+Paging in the pigpen GUI **wraps around**: scrolling up while on the first page (or clicking `<` in the footer) jumps straight to the last page — the very last pig; scrolling down on the last page returns to the first. On the keyboard, `End` jumps to the last page and selects the last pig, `Home` goes back to the first page, and `PageUp` / `PageDown` also cycle with wrap-around.
+
 ### Chat stickers
 
 Open the chat input box: there is a small pigpen icon in the bottom-right corner. Click it to open a picker of the pigs you have collected. Clicking a pig inserts `[pig name]` into the input box; once sent, the chat renders it as that pig's little portrait.
