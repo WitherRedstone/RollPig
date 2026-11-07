@@ -13,6 +13,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.util.Mth;
+import org.lwjgl.glfw.GLFW;
 
 import java.util.List;
 import java.util.Map;
@@ -366,10 +367,11 @@ public class PigPenScreen extends Screen {
         int prevX = prevArrowX();
         int nextX = nextArrowX();
         int y = this.footerY - 2;
-        boolean hoverPrev = this.page > 0 && inside(mouseX, mouseY, prevX, y, 12, 12);
-        boolean hoverNext = this.page < pages - 1 && inside(mouseX, mouseY, nextX, y, 12, 12);
-        text(guiGraphics, Component.literal("<"), prevX + 2, y + 2, this.page > 0 ? (hoverPrev ? TEXT : MUTED) : 0xFF3C414D);
-        text(guiGraphics, Component.literal(">"), nextX + 2, y + 2, this.page < pages - 1 ? (hoverNext ? TEXT : MUTED) : 0xFF3C414D);
+        // 循环翻页：在首页按 "<" 会直接跳到最后一页（最后一个猪），在末页按 ">" 回到首页。
+        boolean hoverPrev = inside(mouseX, mouseY, prevX, y, 12, 12);
+        boolean hoverNext = inside(mouseX, mouseY, nextX, y, 12, 12);
+        text(guiGraphics, Component.literal("<"), prevX + 2, y + 2, hoverPrev ? TEXT : MUTED);
+        text(guiGraphics, Component.literal(">"), nextX + 2, y + 2, hoverNext ? TEXT : MUTED);
     }
 
     private int prevArrowX() {
@@ -384,6 +386,7 @@ public class PigPenScreen extends Screen {
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        int pages = pageCount();
         if (button == 0) {
             if (inside(mouseX, mouseY, this.left + PANEL_W - 22, this.top + 5, 14, 14)) {
                 playClick();
@@ -404,18 +407,55 @@ public class PigPenScreen extends Screen {
                 RPNetwork.requestRoll();
                 return true;
             }
-            if (this.page > 0 && inside(mouseX, mouseY, prevArrowX(), this.footerY - 2, 12, 12)) {
-                this.page--;
+            if (pages > 1 && inside(mouseX, mouseY, prevArrowX(), this.footerY - 2, 12, 12)) {
+                this.page = this.page > 0 ? this.page - 1 : pages - 1;
                 this.analysisScroll = 0;
                 return true;
             }
-            if (this.page < pageCount() - 1 && inside(mouseX, mouseY, nextArrowX(), this.footerY - 2, 12, 12)) {
-                this.page++;
+            if (pages > 1 && inside(mouseX, mouseY, nextArrowX(), this.footerY - 2, 12, 12)) {
+                this.page = this.page < pages - 1 ? this.page + 1 : 0;
                 this.analysisScroll = 0;
                 return true;
             }
         }
         return super.mouseClicked(mouseX, mouseY, button);
+    }
+
+    @Override
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        int pages = pageCount();
+        switch (keyCode) {
+            case GLFW.GLFW_KEY_END -> {
+                // 直接在最后一页、选中最后一只猪
+                this.page = pages - 1;
+                this.selected = Math.max(0, this.pigs.size() - 1);
+                this.analysisScroll = 0;
+                return true;
+            }
+            case GLFW.GLFW_KEY_HOME -> {
+                this.page = 0;
+                this.selected = 0;
+                this.analysisScroll = 0;
+                return true;
+            }
+            case GLFW.GLFW_KEY_PAGE_DOWN -> {
+                if (pages > 1) {
+                    this.page = this.page < pages - 1 ? this.page + 1 : 0;
+                    this.analysisScroll = 0;
+                    return true;
+                }
+            }
+            case GLFW.GLFW_KEY_PAGE_UP -> {
+                if (pages > 1) {
+                    this.page = this.page > 0 ? this.page - 1 : pages - 1;
+                    this.analysisScroll = 0;
+                    return true;
+                }
+            }
+            default -> {
+            }
+        }
+        return super.keyPressed(keyCode, scanCode, modifiers);
     }
 
     @Override
@@ -431,16 +471,19 @@ public class PigPenScreen extends Screen {
             this.analysisScroll = Mth.clamp(this.analysisScroll + delta, 0, this.analysisMaxScroll);
             return true;
         }
-        // 光标在面板里：翻页
+        // 光标在面板里：循环翻页（首页继续往上滚 → 最后一页，末页继续往下滚 → 首页）
         if (mouseX >= this.left && mouseX <= this.left + PANEL_W
                 && mouseY >= this.contentTop && mouseY <= this.bodyBottom) {
-            if (scrollY > 0.0D) {
-                this.page = Math.max(0, this.page - 1);
-            } else {
-                this.page = Math.min(pageCount() - 1, this.page + 1);
+            int pages = pageCount();
+            if (pages > 1) {
+                if (scrollY > 0.0D) {
+                    this.page = this.page > 0 ? this.page - 1 : pages - 1;
+                } else {
+                    this.page = this.page < pages - 1 ? this.page + 1 : 0;
+                }
+                this.analysisScroll = 0;
+                return true;
             }
-            this.analysisScroll = 0;
-            return true;
         }
         return super.mouseScrolled(mouseX, mouseY, scrollX, scrollY);
     }
