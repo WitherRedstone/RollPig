@@ -4,8 +4,9 @@
   "compatibilityLevel": "JAVA_21",
   "mixins": [],
   "client": [
-    "ChatComponentMixin",
-    "ChatScreenMixin"
+    "client.ChatScreenMixin",
+    "client.FontSetMixin",
+    "client.PigFontRenderMixin"
   ],
   "injectors": {
     "defaultRequire": 1

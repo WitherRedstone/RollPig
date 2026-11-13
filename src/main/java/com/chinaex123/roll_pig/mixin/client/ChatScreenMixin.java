@@ -1,4 +1,4 @@
-package com.chinaex123.roll_pig.mixin;
+package com.chinaex123.roll_pig.mixin.client;
 
 import com.chinaex123.roll_pig.client.chat.PigChatInput;
 import net.minecraft.client.gui.components.EditBox;

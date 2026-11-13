@@ -2,7 +2,6 @@ package com.chinaex123.roll_pig;
 
 import com.chinaex123.roll_pig.config.RPConfig;
 import com.chinaex123.roll_pig.data.state.PigRegistry;
-import com.chinaex123.roll_pig.data.state.RPGlyphs;
 import com.chinaex123.roll_pig.init.RPAttachments;
 import com.chinaex123.roll_pig.init.RPCreativeTabs;
 import com.chinaex123.roll_pig.init.RPItems;
@@ -24,6 +23,5 @@ public class RollPig {
         RPCreativeTabs.register(modEventBus);
         modContainer.registerConfig(ModConfig.Type.COMMON, RPConfig.SPEC);
         PigRegistry.all();
-        RPGlyphs.warmup();
     }
 }

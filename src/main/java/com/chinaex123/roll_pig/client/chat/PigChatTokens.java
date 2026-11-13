@@ -1,14 +1,13 @@
 package com.chinaex123.roll_pig.client.chat;
 
-import com.chinaex123.roll_pig.RollPig;
 import com.chinaex123.roll_pig.client.ClientPigData;
-import com.chinaex123.roll_pig.util.Pig;
 import com.chinaex123.roll_pig.data.state.PigRegistry;
+import com.chinaex123.roll_pig.util.Pig;
+import com.chinaex123.roll_pig.util.PigGlyphs;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.HoverEvent;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Style;
-import net.minecraft.resources.ResourceLocation;
 
 import java.util.Optional;
 import java.util.regex.Matcher;
@@ -16,17 +15,7 @@ import java.util.regex.Pattern;
 
 public final class PigChatTokens {
 
-    public static final char ANCHOR = '\uE002';
-
-    public static final int IMAGE_SIZE = 12;
-
     private static final Pattern TOKEN = Pattern.compile("\\[([^\\[\\]\\s]{1,32})]");
-
-    private static final ResourceLocation FONT =
-            ResourceLocation.fromNamespaceAndPath(RollPig.MODID, "card_indent");
-
-    private PigChatTokens() {
-    }
 
     public static Component decorate(Component message) {
         return decorate(message, false);
@@ -43,7 +32,7 @@ public final class PigChatTokens {
         if (!changed[0]) {
             return message;
         }
-        return Component.literal("").append(out).append("");
+        return out;
     }
 
     private static Component replace(String text, Style style, boolean[] changed, boolean requireUnlocked) {
@@ -87,11 +76,12 @@ public final class PigChatTokens {
     }
 
     private static MutableComponent image(Pig pig) {
-        return Component.literal(String.valueOf(ANCHOR))
-                .withStyle(Style.EMPTY
-                        .withFont(FONT)
-                        .withInsertion(pig.id())
-                        .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
-                                Component.literal(pig.name()))));
+        MutableComponent glyph = PigGlyphs.sticker(pig.id());
+        if (glyph.getString().isEmpty()) {
+            return Component.literal("[" + pig.name() + "]");
+        }
+        return glyph.withStyle(style -> style
+                .withInsertion(pig.id())
+                .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal(pig.name()))));
     }
 }

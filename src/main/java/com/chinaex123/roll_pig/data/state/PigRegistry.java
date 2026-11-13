@@ -103,6 +103,7 @@ public final class PigRegistry {
         synchronized (PigRegistry.class) {
             cache = null;
         }
+        com.chinaex123.roll_pig.util.PigGlyphs.invalidate();
     }
 
     public static ResourceLocation imageLocation(String pigId) {

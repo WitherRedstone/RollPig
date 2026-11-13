@@ -1,6 +1,5 @@
 package com.chinaex123.roll_pig.util;
 
-import com.chinaex123.roll_pig.data.state.RPGlyphs;
 import com.chinaex123.roll_pig.data.state.RollPigState;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
@@ -22,7 +21,7 @@ public final class RPChatCard {
                 .withStyle(ChatFormatting.GOLD, ChatFormatting.BOLD));
         card.append("\n");
 
-        card.append(RPGlyphs.icon(pig.id()));
+        card.append(PigGlyphs.card(pig.id()));
         card.append("\n");
 
         card.append(Component.literal(INDENT));
