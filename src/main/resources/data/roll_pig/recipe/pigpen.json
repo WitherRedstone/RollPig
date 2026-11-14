@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "BBB",
+    "BAB",
+    "BBB"
+  ],
+  "key": {
+    "A": "minecraft:carrot",
+    "B": "minecraft:porkchop"
+  },
+  "result": {
+    "id": "roll_pig:pigpen",
+    "count": 1
+  }
+}
