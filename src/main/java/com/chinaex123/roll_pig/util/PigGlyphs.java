@@ -29,8 +29,8 @@ public final class PigGlyphs {
     /** 行内小图标在 9px 行高里的垂直位置：底边落在行顶下方 10.5px，视觉上居中。 */
     private static final float STICKER_BOTTOM = 10.5F;
 
-    /** 卡片头像的底边落在基线上。 */
-    private static final float CARD_BOTTOM = 36.0F;
+    /** 卡片头像的位置。 */
+    private static final float CARD_BOTTOM = 38.0F;
 
     private static volatile Snapshot snapshot;
 
